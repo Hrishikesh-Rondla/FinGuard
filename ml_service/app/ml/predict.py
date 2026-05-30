@@ -9,6 +9,8 @@ from typing import Dict, List, Optional, Any
 import joblib
 import numpy as np
 
+import pandas as pd
+
 # Paths to artifacts
 ARTIFACTS_DIR = Path(__file__).resolve().parent / "artifacts"
 
@@ -95,10 +97,11 @@ def predict(features: Dict[str, float]) -> Dict[str, Any]:
                 "Model artifacts not found. Please run the training pipeline first."
             )
 
-    # Build feature vector in the correct order
-    feature_vector = np.array(
-        [features.get(name, 0.0) for name in _feature_names], dtype=float
-    ).reshape(1, -1)
+    # Build feature vector in the correct order (as DataFrame for sklearn compatibility)
+    feature_vector = pd.DataFrame(
+        [[features.get(name, 0.0) for name in _feature_names]],
+        columns=_feature_names,
+    )
 
     # Scale
     feature_vector_scaled = _scaler.transform(feature_vector)

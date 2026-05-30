@@ -32,53 +32,103 @@ User → React Frontend → Express API → MongoDB (store transactions)
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start — Step by Step
 
 ### Prerequisites
-- **Node.js** 18+ and npm
-- **Python** 3.10+ and pip
-- **MongoDB** running locally (or use Docker)
+- **Node.js** 18+ and npm (`node --version` to check)
+- **Python** 3.10+ and pip (`python --version` to check)
+- **MongoDB** running locally (as a service or via Docker)
 - **Git**
 
-### Option 1: Run Services Individually
+### Step 0: Clone & Setup Dataset
 
-#### 1. ML Service (Python/FastAPI)
+```bash
+git clone https://github.com/Hrishikesh-Rondla/FinGuard.git
+cd FinGuard
+```
+
+> **Important**: Download the [Give Me Some Credit dataset](https://www.kaggle.com/c/GiveMeSomeCredit/data) from Kaggle and place `cs-training.csv` inside `ml_service/data/`:
+```bash
+mkdir -p ml_service/data
+# Copy cs-training.csv into ml_service/data/
+```
+
+### Step 1: Start the ML Service (Terminal 1)
+
 ```bash
 cd ml_service
 pip install -r requirements.txt
-
-# Place the Kaggle "Give Me Some Credit" dataset:
-# ml_service/data/cs-training.csv
-
-# Start the service (auto-trains model on first run)
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-#### 2. Backend Server (Node.js/Express)
+> On first startup, the service will automatically train the model using the dataset (~15-30 seconds). You'll see training metrics printed to the console. Subsequent startups will skip training and load the saved model instantly.
+
+**Verify**: Open `http://localhost:8000/health` in your browser — you should see:
+```json
+{"status": "healthy", "model_loaded": true, "version": "1.0.0"}
+```
+
+### Step 2: Start the Backend Server (Terminal 2)
+
 ```bash
 cd server
 npm install
+```
 
-# Seed the database with demo data
+**Seed the database** (creates a demo user with 3 months of sample transactions):
+```bash
 npm run seed
+```
 
-# Start the server
+**Start the server**:
+```bash
 npm run dev
 ```
 
-#### 3. Frontend Client (React/Vite)
+**Verify**: You should see:
+```
+FinGuard server running on port 5000
+MongoDB Connected: localhost
+```
+
+### Step 3: Start the Frontend (Terminal 3)
+
 ```bash
 cd client
 npm install
 npm run dev
 ```
 
-### Option 2: Docker Compose
+**Verify**: Open `http://localhost:3000` in your browser.
+
+### Step 4: Login & Use the App
+
+Open `http://localhost:3000` and login with the demo account:
+
+```
+Email:    demo@finguard.com
+Password: password123
+```
+
+Once logged in:
+1. **Dashboard** — View KPIs, expense charts, and stress gauge
+2. Click **"Run Prediction"** — The system aggregates your transactions, sends them to the ML model, and displays your stress level with recommendations
+3. **Transactions** — Add/edit/delete financial transactions
+4. **Predictions** — View your prediction history and stress trends
+5. **Alerts** — Review all financial warnings and tips
+6. **Profile** — Update your monthly income
+
+---
+
+## 🐳 Option 2: Docker Compose
+
+If you have Docker installed and running:
+
 ```bash
 docker-compose up --build
 ```
 
-This starts all services:
+This starts all services automatically:
 - **MongoDB** at `localhost:27017`
 - **ML Service** at `localhost:8000`
 - **Express Server** at `localhost:5000`
@@ -88,7 +138,7 @@ This starts all services:
 
 ## 🔑 Demo Credentials
 
-After running the seed script:
+After running the seed script (`npm run seed` in the server directory):
 ```
 Email:    demo@finguard.com
 Password: password123
@@ -99,32 +149,45 @@ Password: password123
 ## 📁 Project Structure
 
 ```
-finguard/
+FinGuard/
 ├── client/                 # React 18 Frontend (Vite + Tailwind)
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Route pages
-│   │   ├── context/        # Auth & Alert contexts
-│   │   ├── services/       # API client (Axios)
+│   │   │   ├── layout/     # Sidebar, Navbar, AppLayout
+│   │   │   ├── dashboard/  # KPICard, StressGauge, Charts
+│   │   │   ├── transactions/  # TransactionTable, TransactionForm
+│   │   │   └── alerts/     # AlertBanner, RecommendationCard
+│   │   ├── pages/          # Login, Register, Dashboard, Transactions,
+│   │   │                   # Predictions, Alerts, Profile
+│   │   ├── context/        # AuthContext, AlertContext
+│   │   ├── services/       # api.js (Axios with JWT interceptors)
 │   │   └── App.jsx         # Root component & routing
-│   └── vite.config.js
+│   ├── .env                # VITE_API_BASE_URL
+│   └── vite.config.js      # Dev server config with API proxy
 │
 ├── server/                 # Express.js Backend API
-│   ├── config/             # Database config
-│   ├── controllers/        # Route handlers
-│   ├── middleware/          # Auth & error middleware
-│   ├── models/             # Mongoose schemas
-│   ├── routes/             # API routes
-│   ├── services/           # ML service client
+│   ├── config/db.js        # MongoDB connection
+│   ├── controllers/        # authController, transactionController,
+│   │                       # predictionController, alertController
+│   ├── middleware/          # JWT auth & error handling
+│   ├── models/             # User, Transaction, Prediction, Alert
+│   ├── routes/             # API route definitions
+│   ├── services/mlService.js  # Axios client for FastAPI ML service
 │   ├── seed.js             # Demo data seeder
+│   ├── .env                # PORT, MONGO_URI, JWT_SECRET, ML_SERVICE_URL
 │   └── index.js            # Entry point
 │
 ├── ml_service/             # Python FastAPI ML Service
 │   ├── app/
-│   │   ├── ml/             # Training, inference, features
-│   │   ├── routes/         # API endpoints
-│   │   └── main.py         # FastAPI entry point
-│   ├── data/               # Training dataset (gitignored)
+│   │   ├── ml/
+│   │   │   ├── train.py    # Full training pipeline (3 models)
+│   │   │   ├── predict.py  # Model inference
+│   │   │   ├── features.py # Feature engineering (12 features)
+│   │   │   ├── recommend.py # Recommendation engine
+│   │   │   └── artifacts/  # Saved .joblib model files
+│   │   ├── routes/predict.py  # POST /predict endpoint
+│   │   └── main.py         # FastAPI entry point (auto-trains on startup)
+│   ├── data/               # Place cs-training.csv here (gitignored)
 │   └── requirements.txt
 │
 ├── docker-compose.yml      # Multi-service Docker setup
@@ -157,12 +220,14 @@ finguard/
 - **Recommendations**: 3-5 personalized financial tips
 - **Risk Factors**: Top 3 contributing risk indicators
 
-### Models Trained
-1. Logistic Regression (baseline)
-2. Random Forest (n=200, depth=10)
-3. XGBoost (n=300, lr=0.05, depth=6)
+### Models Trained & Compared
+| Model | Accuracy | F1 Score | ROC-AUC |
+|-------|----------|----------|---------|
+| Logistic Regression | 79.63% | 0.8008 | 0.9241 |
+| **Random Forest** ⭐ | **93.18%** | **0.9311** | **0.9676** |
+| XGBoost | 93.01% | 0.9294 | 0.9665 |
 
-Best model selected by weighted F1-score.
+**Best model: Random Forest** — selected by highest weighted F1-score.
 
 ### Training Dataset
 [Kaggle — Give Me Some Credit](https://www.kaggle.com/c/GiveMeSomeCredit) (~150K records)
@@ -203,7 +268,7 @@ Best model selected by weighted F1-score.
 | PUT | `/read-all` | Mark all read |
 | DELETE | `/:id` | Dismiss alert |
 
-### ML Service
+### ML Service (`localhost:8000`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/predict` | Run ML prediction |
@@ -215,8 +280,8 @@ Best model selected by weighted F1-score.
 ## 🎨 UI Design
 
 - **Theme**: Dark-mode financial dashboard
-- **Background**: Deep navy (#0F172A)
-- **Accents**: Teal (#00D4AA), Amber (#F59E0B), Rose (#F43F5E)
+- **Background**: Deep navy (`#0F172A`)
+- **Accents**: Teal (`#00D4AA`), Amber (`#F59E0B`), Rose (`#F43F5E`)
 - **Fonts**: IBM Plex Mono (data), DM Sans (body)
 - **Style**: Glassmorphism cards with backdrop-blur
 - **Responsive**: Sidebar → bottom nav on mobile
@@ -239,6 +304,20 @@ ML_SERVICE_URL=http://localhost:8000
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api
 ```
+
+> Both `.env` files are included in the repository with development defaults. For production, create `.env.local` files with your actual secrets (these are gitignored).
+
+---
+
+## 🔧 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `MongoDB connection failed` | Ensure MongoDB is running (`mongod` or check Windows Services for "MongoDB") |
+| `ML service: model artifacts not found` | Place `cs-training.csv` in `ml_service/data/` and restart the service |
+| `CORS errors in browser` | Make sure all 3 services are running on correct ports (3000, 5000, 8000) |
+| `npm run seed` fails | Ensure MongoDB is running and `MONGO_URI` in `server/.env` is correct |
+| Frontend shows blank page | Check browser console for errors; ensure backend is running on port 5000 |
 
 ---
 

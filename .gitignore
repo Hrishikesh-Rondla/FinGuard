@@ -8,8 +8,7 @@ dist/
 build/
 *.egg-info/
 
-# Environment files
-.env
+# Environment overrides (keep .env tracked for dev defaults)
 .env.local
 .env.*.local
 
