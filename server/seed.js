@@ -49,7 +49,7 @@ async function seed() {
       name: 'Demo User',
       email: 'demo@finguard.com',
       passwordHash: 'password123',
-      monthlyIncome: 5000,
+      monthlyIncome: 50000,
     });
     console.log(`Created demo user: ${user.email}`);
 
@@ -67,7 +67,7 @@ async function seed() {
         // Monthly income
         transactions.push({
           userId,
-          amount: 5000,
+          amount: 50000,
           category: 'income',
           type: 'income',
           description: 'Monthly salary',
@@ -77,7 +77,7 @@ async function seed() {
         // Rent
         transactions.push({
           userId,
-          amount: 1200,
+          amount: 12000,
           category: 'rent',
           type: 'expense',
           description: 'Monthly rent payment',
@@ -87,7 +87,7 @@ async function seed() {
         // Utilities
         transactions.push({
           userId,
-          amount: randAmount(100, 200),
+          amount: randAmount(1000, 2500),
           category: 'utilities',
           type: 'expense',
           description: 'Monthly utilities bill',
@@ -97,7 +97,7 @@ async function seed() {
         // Healthcare
         transactions.push({
           userId,
-          amount: randAmount(50, 200),
+          amount: randAmount(500, 2000),
           category: 'healthcare',
           type: 'expense',
           description: 'Health insurance / medical',
@@ -107,7 +107,7 @@ async function seed() {
         // Debt payment
         transactions.push({
           userId,
-          amount: 300,
+          amount: 3000,
           category: 'debt_payment',
           type: 'debt',
           description: 'Monthly loan payment',
@@ -117,7 +117,7 @@ async function seed() {
         // Savings
         transactions.push({
           userId,
-          amount: randAmount(200, 500),
+          amount: randAmount(2000, 5000),
           category: 'savings',
           type: 'savings',
           description: 'Monthly savings transfer',
@@ -131,7 +131,7 @@ async function seed() {
       if ([1, 3, 5].includes(dayOfWeek) || (dayOfWeek === 6 && Math.random() > 0.5)) {
         transactions.push({
           userId,
-          amount: randAmount(50, 150),
+          amount: randAmount(500, 1500),
           category: 'groceries',
           type: 'expense',
           description: 'Grocery shopping',
@@ -143,7 +143,7 @@ async function seed() {
       if (dayOfWeek >= 1 && dayOfWeek <= 5 && Math.random() > 0.2) {
         transactions.push({
           userId,
-          amount: randAmount(30, 80),
+          amount: randAmount(100, 500),
           category: 'transport',
           type: 'expense',
           description: 'Transportation / fuel',
@@ -155,7 +155,7 @@ async function seed() {
       if (Math.random() > 0.6) {
         transactions.push({
           userId,
-          amount: randAmount(20, 100),
+          amount: randAmount(200, 1000),
           category: 'entertainment',
           type: 'expense',
           description: 'Entertainment / streaming / events',
@@ -167,7 +167,7 @@ async function seed() {
       if (Math.random() > 0.4) {
         transactions.push({
           userId,
-          amount: randAmount(15, 60),
+          amount: randAmount(150, 600),
           category: 'dining',
           type: 'expense',
           description: 'Restaurant / takeout',
@@ -179,7 +179,7 @@ async function seed() {
       if (Math.random() > 0.8) {
         transactions.push({
           userId,
-          amount: randAmount(30, 200),
+          amount: randAmount(300, 2000),
           category: 'shopping',
           type: 'expense',
           description: 'Online / retail shopping',
@@ -226,10 +226,10 @@ async function seed() {
         console.log(`  ${cat}: ${count} transactions`);
       });
 
-    console.log(`\nTotal income:   $${totalIncome.toFixed(2)}`);
-    console.log(`Total expenses: $${totalExpenses.toFixed(2)}`);
-    console.log(`Total savings:  $${totalSavings.toFixed(2)}`);
-    console.log(`Total debt:     $${totalDebt.toFixed(2)}`);
+    console.log(`\nTotal income:   ₹${totalIncome.toFixed(2)}`);
+    console.log(`Total expenses: ₹${totalExpenses.toFixed(2)}`);
+    console.log(`Total savings:  ₹${totalSavings.toFixed(2)}`);
+    console.log(`Total debt:     ₹${totalDebt.toFixed(2)}`);
 
     console.log('\nSeeding complete!');
   } catch (error) {
