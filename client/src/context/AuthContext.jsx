@@ -15,6 +15,7 @@ export function AuthProvider({ children }) {
       const savedToken = localStorage.getItem('finguard_token');
       if (savedToken) {
         try {
+          // API interceptor unwraps to { user }
           const data = await auth.getMe();
           setUser(data.user || data);
           setToken(savedToken);
@@ -33,11 +34,15 @@ export function AuthProvider({ children }) {
     try {
       setError(null);
       setLoading(true);
+      // API interceptor unwraps to { user, token }
       const data = await auth.login(email, password);
-      const newToken = data.token || data.access_token;
+      const newToken = data.token;
+      if (!newToken) {
+        throw new Error('No token received from server');
+      }
       localStorage.setItem('finguard_token', newToken);
       setToken(newToken);
-      setUser(data.user || data);
+      setUser(data.user);
       return data;
     } catch (err) {
       setError(err.message);
@@ -51,11 +56,15 @@ export function AuthProvider({ children }) {
     try {
       setError(null);
       setLoading(true);
+      // API interceptor unwraps to { user, token }
       const data = await auth.register(name, email, password);
-      const newToken = data.token || data.access_token;
+      const newToken = data.token;
+      if (!newToken) {
+        throw new Error('No token received from server');
+      }
       localStorage.setItem('finguard_token', newToken);
       setToken(newToken);
-      setUser(data.user || data);
+      setUser(data.user);
       return data;
     } catch (err) {
       setError(err.message);

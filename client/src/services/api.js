@@ -21,9 +21,17 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor — handle 401 and extract errors
+// Response interceptor — unwrap server envelope and handle 401
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Server returns { success, data: { ... }, message, error }
+    // Unwrap the envelope so consumers get the inner data directly
+    const body = response.data;
+    if (body && typeof body === 'object' && 'success' in body) {
+      return body.data !== undefined ? body.data : body;
+    }
+    return body;
+  },
   (error) => {
     if (error.response) {
       if (error.response.status === 401) {
