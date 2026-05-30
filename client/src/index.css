@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-navy-900 text-gray-100 font-sans antialiased;
+  }
+  
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-navy-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-navy-700 rounded-full;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-navy-800/50 backdrop-blur-md border border-white/10 rounded-2xl;
+  }
+  
+  .glass-card-hover {
+    @apply glass-card hover:border-white/20 transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply bg-teal text-navy-900 font-semibold px-6 py-2.5 rounded-xl 
+           hover:bg-teal-light transition-all duration-200 
+           active:scale-95 shadow-lg shadow-teal/20;
+  }
+  
+  .btn-secondary {
+    @apply bg-navy-700 text-gray-200 font-medium px-6 py-2.5 rounded-xl 
+           hover:bg-navy-600 transition-all duration-200 border border-white/10;
+  }
+  
+  .btn-danger {
+    @apply bg-rose/20 text-rose font-medium px-6 py-2.5 rounded-xl 
+           hover:bg-rose/30 transition-all duration-200 border border-rose/30;
+  }
+  
+  .input-field {
+    @apply w-full bg-navy-900/50 border border-white/10 rounded-xl px-4 py-3 
+           text-gray-100 placeholder-gray-500 
+           focus:outline-none focus:border-teal/50 focus:ring-1 focus:ring-teal/30 
+           transition-all duration-200;
+  }
+  
+  .badge-low {
+    @apply bg-teal/20 text-teal border border-teal/30 px-3 py-1 rounded-full text-sm font-medium;
+  }
+  
+  .badge-medium {
+    @apply bg-amber/20 text-amber border border-amber/30 px-3 py-1 rounded-full text-sm font-medium;
+  }
+  
+  .badge-high {
+    @apply bg-rose/20 text-rose border border-rose/30 px-3 py-1 rounded-full text-sm font-medium animate-pulse;
+  }
+  
+  .stat-value {
+    @apply text-3xl font-mono font-semibold tracking-tight;
+  }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+}
+
+.pulse-ring-animation {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
