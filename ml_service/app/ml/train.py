@@ -212,7 +212,7 @@ def train_and_evaluate():
 
     models = {
         "LogisticRegression": LogisticRegression(
-            max_iter=1000, random_state=42, multi_class="multinomial"
+            max_iter=1000, random_state=42
         ),
         "RandomForest": RandomForestClassifier(
             n_estimators=200, max_depth=10, random_state=42, n_jobs=-1
@@ -221,7 +221,6 @@ def train_and_evaluate():
             n_estimators=300,
             learning_rate=0.05,
             max_depth=6,
-            use_label_encoder=False,
             eval_metric="mlogloss",
             random_state=42,
             n_jobs=-1,
