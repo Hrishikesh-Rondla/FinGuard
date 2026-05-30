@@ -53,20 +53,16 @@ api.interceptors.response.use(
 // ==================== AUTH ====================
 export const auth = {
   login: async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
-    return data;
+    return await api.post('/auth/login', { email, password });
   },
   register: async (name, email, password) => {
-    const { data } = await api.post('/auth/register', { name, email, password });
-    return data;
+    return await api.post('/auth/register', { name, email, password });
   },
   getMe: async () => {
-    const { data } = await api.get('/auth/me');
-    return data;
+    return await api.get('/auth/me');
   },
   logout: async () => {
-    const { data } = await api.post('/auth/logout');
-    return data;
+    return await api.post('/auth/logout');
   },
 };
 
@@ -74,61 +70,50 @@ export const auth = {
 export const transactions = {
   getTransactions: async (page = 1, limit = 10, filters = {}) => {
     const params = { page, limit, ...filters };
-    const { data } = await api.get('/transactions', { params });
-    return data;
+    return await api.get('/transactions', { params });
   },
   addTransaction: async (transactionData) => {
-    const { data } = await api.post('/transactions', transactionData);
-    return data;
+    return await api.post('/transactions', transactionData);
   },
   updateTransaction: async (id, transactionData) => {
-    const { data } = await api.put(`/transactions/${id}`, transactionData);
-    return data;
+    return await api.put(`/transactions/${id}`, transactionData);
   },
   deleteTransaction: async (id) => {
-    const { data } = await api.delete(`/transactions/${id}`);
-    return data;
+    return await api.delete(`/transactions/${id}`);
   },
   getTransactionSummary: async () => {
-    const { data } = await api.get('/transactions/summary');
-    return data;
+    return await api.get('/transactions/summary');
   },
 };
 
 // ==================== PREDICTIONS ====================
 export const predictions = {
   runPrediction: async () => {
-    const { data } = await api.post('/predictions/run');
-    return data;
+    return await api.post('/predictions/run');
   },
   getPredictionHistory: async () => {
-    const { data } = await api.get('/predictions/history');
-    return data;
+    return await api.get('/predictions/history');
   },
   getLatestPrediction: async () => {
-    const { data } = await api.get('/predictions/latest');
-    return data;
+    return await api.get('/predictions/latest');
   },
 };
 
 // ==================== ALERTS ====================
 export const alerts = {
   getAlerts: async () => {
-    const { data } = await api.get('/alerts');
-    return data;
+    return await api.get('/alerts');
   },
   markAlertRead: async (id) => {
-    const { data } = await api.put(`/alerts/${id}/read`);
-    return data;
+    return await api.put(`/alerts/${id}/read`);
   },
   markAllRead: async () => {
-    const { data } = await api.put('/alerts/read-all');
-    return data;
+    return await api.put('/alerts/read-all');
   },
   dismissAlert: async (id) => {
-    const { data } = await api.delete(`/alerts/${id}`);
-    return data;
+    return await api.delete(`/alerts/${id}`);
   },
 };
 
 export default api;
+
