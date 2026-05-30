@@ -19,35 +19,35 @@ async def lifespan(app: FastAPI):
     Application lifespan handler.
     On startup: check for model artifacts; if missing, run training pipeline.
     """
-    print("\n🚀 FinGuard ML Service starting up...")
+    print("\n[*] FinGuard ML Service starting up...")
 
     if not artifacts_exist():
-        print("⚠️  Model artifacts not found. Running training pipeline...")
+        print("[!] Model artifacts not found. Running training pipeline...")
         try:
             from app.ml.train import train_and_evaluate
             train_and_evaluate()
-            print("✅ Training pipeline completed successfully.")
+            print("[OK] Training pipeline completed successfully.")
         except Exception as e:
-            print(f"❌ Training failed: {e}")
+            print(f"[ERROR] Training failed: {e}")
             traceback.print_exc()
     else:
-        print("✅ Model artifacts found.")
+        print("[OK] Model artifacts found.")
 
     # Load model into memory
     success = load_model()
     if success:
         metadata = get_model_metadata()
-        print(f"✅ Model loaded: {metadata.get('name', 'Unknown')}")
-        print(f"   Accuracy: {metadata.get('accuracy', 'N/A')}")
-        print(f"   F1 Score: {metadata.get('f1', 'N/A')}")
+        print(f"[OK] Model loaded: {metadata.get('name', 'Unknown')}")
+        print(f"     Accuracy: {metadata.get('accuracy', 'N/A')}")
+        print(f"     F1 Score: {metadata.get('f1', 'N/A')}")
     else:
-        print("⚠️  Could not load model artifacts.")
+        print("[!] Could not load model artifacts.")
 
-    print("🚀 FinGuard ML Service is ready!\n")
+    print("[*] FinGuard ML Service is ready!\n")
 
     yield  # App runs here
 
-    print("\n👋 FinGuard ML Service shutting down...")
+    print("\n[*] FinGuard ML Service shutting down...")
 
 
 # ── App ────────────────────────────────────────────────────────────────────────
