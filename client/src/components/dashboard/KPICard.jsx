@@ -35,7 +35,7 @@ export default function KPICard({ title, value, icon: Icon, trend, color = 'teal
   return (
     <div
       id={`kpi-card-${title?.toLowerCase().replace(/\s+/g, '-')}`}
-      className="glass-card-hover p-6 group cursor-default"
+      className="glass-card-hover p-6 group cursor-default overflow-hidden"
     >
       <div className="flex items-start justify-between mb-4">
         <div className={clsx('p-2.5 rounded-xl', colors.iconBg)}>
@@ -47,7 +47,7 @@ export default function KPICard({ title, value, icon: Icon, trend, color = 'teal
           </div>
         )}
       </div>
-      <p className={clsx('stat-value mb-1', colors.valueText)}>{value}</p>
+      <p title={value} className={clsx('stat-value mb-1 truncate', colors.valueText)}>{value}</p>
       <p className="text-sm text-gray-400 font-medium">{title}</p>
     </div>
   );

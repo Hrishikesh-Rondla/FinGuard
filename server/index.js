@@ -12,7 +12,6 @@ const { errorHandler } = require('./middleware/errorMiddleware');
 const authRoutes = require('./routes/authRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const predictionRoutes = require('./routes/predictionRoutes');
-const alertRoutes = require('./routes/alertRoutes');
 
 // Connect to MongoDB
 connectDB();
@@ -39,7 +38,6 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/predictions', predictionRoutes);
-app.use('/api/alerts', alertRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

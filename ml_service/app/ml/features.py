@@ -29,8 +29,9 @@ def engineer_features(input_data: dict) -> dict:
     avg_monthly_expenses = input_data["avg_monthly_expenses"]
 
     # Derived ratios
+    monthly_savings = max(0.0, monthly_income - total_expenses)
     savings_rate = (
-        total_savings / monthly_income if monthly_income > 0 else 0.0
+        monthly_savings / monthly_income if monthly_income > 0 else 0.0
     )
     expense_to_income_ratio = (
         total_expenses / monthly_income if monthly_income > 0 else 1.0
@@ -38,9 +39,7 @@ def engineer_features(input_data: dict) -> dict:
     discretionary_spending_ratio = (
         discretionary_expenses / total_expenses if total_expenses > 0 else 0.0
     )
-    essential_spending_ratio = (
-        essential_expenses / total_expenses if total_expenses > 0 else 0.0
-    )
+    essential_spending_ratio = 1.0 - discretionary_spending_ratio
     debt_to_income_ratio = (
         monthly_debt_payments / monthly_income if monthly_income > 0 else 1.0
     )
@@ -56,6 +55,11 @@ def engineer_features(input_data: dict) -> dict:
     months_of_emergency_fund = (
         total_savings / avg_monthly_expenses if avg_monthly_expenses > 0 else 0.0
     )
+    
+    # Grace period: If the user is actively saving (>10%) but hasn't had time to accumulate a fund, 
+    # don't penalize them heavily.
+    if savings_rate > 0.10 and months_of_emergency_fund < 6.0:
+        months_of_emergency_fund = 6.0
 
     return {
         "monthly_income": float(monthly_income),

@@ -102,6 +102,7 @@ def predict(features: Dict[str, float]) -> Dict[str, Any]:
         [[features.get(name, 0.0) for name in _feature_names]],
         columns=_feature_names,
     )
+    print("API DataFrame:", feature_vector.iloc[0].to_dict())
 
     # Scale
     feature_vector_scaled = _scaler.transform(feature_vector)

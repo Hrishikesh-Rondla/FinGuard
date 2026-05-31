@@ -1,14 +1,12 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, ChevronDown } from 'lucide-react';
+import { LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { useAlerts } from '@/context/AlertContext';
 import { useState, useRef, useEffect } from 'react';
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
   '/transactions': 'Transactions',
   '/predictions': 'Predictions',
-  '/alerts': 'Alerts',
   '/profile': 'Profile',
 };
 
@@ -16,7 +14,6 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { unreadCount } = useAlerts();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -60,19 +57,6 @@ export default function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-4">
-          {/* Notifications Bell */}
-          <button
-            id="navbar-alerts-btn"
-            onClick={() => navigate('/alerts')}
-            className="relative p-2 rounded-xl hover:bg-navy-700/50 transition-all duration-200"
-          >
-            <Bell className="w-5 h-5 text-gray-400" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-rose text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center leading-none">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-            )}
-          </button>
 
           {/* User Dropdown */}
           <div className="relative" ref={dropdownRef}>

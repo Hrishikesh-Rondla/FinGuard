@@ -1,0 +1,14 @@
+const fs = require('fs');
+const path = require('path');
+
+const csvContent = `Date,Description,Amount,Type
+2026-05-01,Zomato order,550,Dr
+2026-05-02,Amazon India,1200,Dr
+2026-05-03,Salary NEFT,50000,Cr
+2026-05-04,Uber Trip,350,Dr
+2026-05-05,Electricity Bill,2100,Dr
+2026-05-06,D Mart groceries,1800,Dr
+`;
+
+fs.writeFileSync(path.join(__dirname, 'dummy_statement.csv'), csvContent);
+console.log('dummy_statement.csv created');

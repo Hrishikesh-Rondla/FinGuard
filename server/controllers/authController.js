@@ -30,7 +30,7 @@ const register = async (req, res, next) => {
     }
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -91,7 +91,7 @@ const login = async (req, res, next) => {
     }
 
     // Find user by email (include passwordHash for comparison)
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -136,6 +136,37 @@ const login = async (req, res, next) => {
 };
 
 /**
+ * @desc    Update user profile (password)
+ * @route   PUT /api/auth/profile
+ * @access  Private
+ */
+const updateProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (req.body.currentPassword && req.body.newPassword) {
+      const isMatch = await user.matchPassword(req.body.currentPassword);
+      if (!isMatch) {
+        return res.status(401).json({ success: false, message: 'Incorrect current password' });
+      }
+      user.passwordHash = req.body.newPassword;
+      await user.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password updated successfully',
+      data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Get current logged in user
  * @route   GET /api/auth/me
  * @access  Private
@@ -173,4 +204,10 @@ const logout = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, getMe, logout };
+module.exports = {
+  register,
+  login,
+  getMe,
+  logout,
+  updateProfile,
+};

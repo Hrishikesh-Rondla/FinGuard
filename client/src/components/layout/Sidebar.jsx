@@ -3,24 +3,20 @@ import {
   LayoutDashboard,
   Receipt,
   Brain,
-  Bell,
   User,
   Shield,
 } from 'lucide-react';
-import { useAlerts } from '@/context/AlertContext';
 import clsx from 'clsx';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/transactions', label: 'Transactions', icon: Receipt },
   { to: '/predictions', label: 'Predictions', icon: Brain },
-  { to: '/alerts', label: 'Alerts', icon: Bell },
   { to: '/profile', label: 'Profile', icon: User },
 ];
 
 export default function Sidebar() {
   const location = useLocation();
-  const { unreadCount } = useAlerts();
 
   return (
     <>
@@ -58,11 +54,6 @@ export default function Sidebar() {
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 <span className="font-medium">{item.label}</span>
-                {item.label === 'Alerts' && unreadCount > 0 && (
-                  <span className="ml-auto bg-rose text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
               </NavLink>
             );
           })}
@@ -97,11 +88,6 @@ export default function Sidebar() {
             >
               <div className="relative">
                 <Icon className="w-5 h-5" />
-                {item.label === 'Alerts' && unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-rose text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center leading-none">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
               </div>
               <span className="text-[10px] font-medium">{item.label}</span>
             </NavLink>

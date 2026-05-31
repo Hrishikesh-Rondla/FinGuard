@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException
 from app.models.schemas import FinancialInput, PredictionResponse
 from app.ml.features import engineer_features
 from app.ml.predict import predict as ml_predict, is_model_loaded
-from app.ml.recommend import generate_recommendations, identify_risk_factors
+from app.ml.recommend import generate_recommendations
 
 router = APIRouter()
 
@@ -39,18 +39,28 @@ async def predict(input_data: FinancialInput):
         # 4. Generate recommendations
         recommendations = generate_recommendations(features)
 
-        # 5. Identify risk factors
-        top_risk_factors = identify_risk_factors(features)
-
-        # 6. Build response
+        # 5. Build response
         return PredictionResponse(
             stress_level=prediction["stress_level"],
             stress_score=prediction["stress_score"],
             probabilities=prediction["probabilities"],
             recommendations=recommendations,
-            top_risk_factors=top_risk_factors,
             model_used=prediction["model_used"],
         )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
+
+from app.models.schemas import CategoryInput, CategoryResponse
+from app.ml.category_model import predict_categories
+
+@router.post("/categorize-batch", response_model=CategoryResponse, tags=["Prediction"])
+async def categorize_batch(input_data: CategoryInput):
+    """
+    Predict transaction categories from a batch of descriptions using the NLP model.
+    """
+    try:
+        categories = predict_categories(input_data.descriptions)
+        return CategoryResponse(categories=categories)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Categorization error: {str(e)}")

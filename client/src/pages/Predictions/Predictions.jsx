@@ -26,10 +26,13 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="glass-card px-4 py-3 shadow-lg">
-        <p className="text-xs text-gray-400">{label}</p>
-        <p className="text-sm font-mono text-gray-200">
-          Score: {payload[0]?.value?.toFixed(2)}
-        </p>
+        <p className="text-xs text-gray-400 mb-2">{label}</p>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-300">Level:</span>
+          <span className={getStressBadgeClass(payload[0]?.payload?.level)}>
+            {payload[0]?.payload?.level?.toUpperCase()}
+          </span>
+        </div>
       </div>
     );
   }
@@ -75,11 +78,16 @@ export default function Predictions() {
   // Prepare trend data
   const trendData = [...history]
     .reverse()
-    .map((p) => ({
-      date: formatDate(p.createdAt || p.created_at || p.date),
-      score: p.stress_score ?? p.stressScore ?? 0,
-      level: p.stress_level || p.stressLevel || 'Low',
-    }));
+    .map((p, i) => {
+      const d = new Date(p.createdAt || p.created_at || p.date);
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      return {
+        date: `${dateStr} ${timeStr}`,
+        score: p.stress_score ?? p.stressScore ?? 0,
+        level: p.stress_level || p.stressLevel || 'Low',
+      };
+    });
 
   if (loading) {
     return (
@@ -186,13 +194,13 @@ export default function Predictions() {
               const score = pred.stress_score ?? pred.stressScore ?? 0;
               const probs = pred.probabilities || {};
               const recommendations = pred.recommendations || [];
-              const riskFactors = pred.risk_factors || pred.riskFactors || [];
+              const riskFactors = pred.topRiskFactors || pred.risk_factors || pred.riskFactors || [];
               const date = pred.createdAt || pred.created_at || pred.date;
 
               const probData = [
-                { name: 'Low', value: probs.low || probs[0] || 0, color: '#00D4AA' },
-                { name: 'Medium', value: probs.medium || probs[1] || 0, color: '#F59E0B' },
-                { name: 'High', value: probs.high || probs[2] || 0, color: '#F43F5E' },
+                { name: 'Low', value: probs.Low || probs.low || probs[0] || 0, color: '#00D4AA' },
+                { name: 'Medium', value: probs.Medium || probs.medium || probs[1] || 0, color: '#F59E0B' },
+                { name: 'High', value: probs.High || probs.high || probs[2] || 0, color: '#F43F5E' },
               ];
 
               return (
@@ -267,25 +275,7 @@ export default function Predictions() {
                     </div>
                   )}
 
-                  {/* Risk Factors */}
-                  {riskFactors.length > 0 && (
-                    <div>
-                      <h4 className="text-xs text-gray-500 uppercase tracking-wider font-medium mb-3">
-                        Risk Factors
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {riskFactors.map((factor, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose/10 border border-rose/20 rounded-lg text-xs text-rose"
-                          >
-                            <AlertTriangle className="w-3 h-3" />
-                            {factor}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Risk factors removed as per user request */}
                 </div>
               );
             })}

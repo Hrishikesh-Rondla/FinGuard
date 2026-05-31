@@ -7,11 +7,6 @@ import api from '@/services/api';
 export default function Profile() {
   const { user } = useAuth();
 
-  const [income, setIncome] = useState(user?.monthlyIncome || user?.monthly_income || '');
-  const [incomeLoading, setIncomeLoading] = useState(false);
-  const [incomeSuccess, setIncomeSuccess] = useState('');
-  const [incomeError, setIncomeError] = useState('');
-
   const [passwords, setPasswords] = useState({
     currentPassword: '',
     newPassword: '',
@@ -20,28 +15,6 @@ export default function Profile() {
   const [pwLoading, setPwLoading] = useState(false);
   const [pwSuccess, setPwSuccess] = useState('');
   const [pwError, setPwError] = useState('');
-
-  const handleIncomeSubmit = async (e) => {
-    e.preventDefault();
-    setIncomeError('');
-    setIncomeSuccess('');
-
-    if (!income || parseFloat(income) < 0) {
-      setIncomeError('Please enter a valid income amount');
-      return;
-    }
-
-    try {
-      setIncomeLoading(true);
-      await api.put('/auth/profile', { monthlyIncome: parseFloat(income) });
-      setIncomeSuccess('Monthly income updated successfully');
-      setTimeout(() => setIncomeSuccess(''), 3000);
-    } catch (err) {
-      setIncomeError(err.message);
-    } finally {
-      setIncomeLoading(false);
-    }
-  };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
@@ -127,63 +100,11 @@ export default function Profile() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <DollarSign className="w-4 h-4 text-gray-500" />
-              <div>
-                <p className="text-xs text-gray-500">Monthly Income</p>
-                <p className="text-sm text-gray-200">
-                  ${(user?.monthlyIncome || user?.monthly_income || 0).toLocaleString()}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Update Income */}
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-teal" />
-          Update Monthly Income
-        </h3>
 
-        {incomeError && (
-          <div className="bg-rose/10 border border-rose/30 text-rose text-sm px-4 py-3 rounded-xl mb-4">
-            {incomeError}
-          </div>
-        )}
-        {incomeSuccess && (
-          <div className="bg-teal/10 border border-teal/30 text-teal text-sm px-4 py-3 rounded-xl mb-4">
-            {incomeSuccess}
-          </div>
-        )}
-
-        <form onSubmit={handleIncomeSubmit} className="flex gap-3">
-          <input
-            id="profile-income"
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Enter monthly income"
-            value={income}
-            onChange={(e) => setIncome(e.target.value)}
-            className="input-field font-mono flex-1"
-          />
-          <button
-            type="submit"
-            id="save-income-btn"
-            disabled={incomeLoading}
-            className="btn-primary flex items-center gap-2 disabled:opacity-50"
-          >
-            {incomeLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
-            Save
-          </button>
-        </form>
-      </div>
 
       {/* Change Password */}
       <div className="glass-card p-6">

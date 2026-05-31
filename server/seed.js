@@ -49,15 +49,15 @@ async function seed() {
       name: 'Demo User',
       email: 'demo@finguard.com',
       passwordHash: 'password123',
-      monthlyIncome: 50000,
+      monthlyIncome: 85000,
     });
     console.log(`Created demo user: ${user.email}`);
 
     const transactions = [];
     const userId = user._id;
 
-    // Generate 3 months (90 days) of transactions
-    for (let day = 0; day < 90; day++) {
+    // Generate 2 years (730 days) of transactions
+    for (let day = 0; day < 730; day++) {
       const date = daysAgo(day);
       const dayOfMonth = date.getDate();
       const dayOfWeek = date.getDay(); // 0=Sun, 6=Sat
@@ -67,7 +67,7 @@ async function seed() {
         // Monthly income
         transactions.push({
           userId,
-          amount: 50000,
+          amount: 85000,
           category: 'income',
           type: 'income',
           description: 'Monthly salary',
@@ -117,7 +117,7 @@ async function seed() {
         // Savings
         transactions.push({
           userId,
-          amount: randAmount(2000, 5000),
+          amount: randAmount(8000, 15000),
           category: 'savings',
           type: 'savings',
           description: 'Monthly savings transfer',
@@ -152,7 +152,7 @@ async function seed() {
       }
 
       // Entertainment: 2-3 times per week
-      if (Math.random() > 0.6) {
+      if (Math.random() > 0.8) {
         transactions.push({
           userId,
           amount: randAmount(200, 1000),
@@ -164,7 +164,7 @@ async function seed() {
       }
 
       // Dining: 3-5 times per week
-      if (Math.random() > 0.4) {
+      if (Math.random() > 0.7) {
         transactions.push({
           userId,
           amount: randAmount(150, 600),
@@ -176,7 +176,7 @@ async function seed() {
       }
 
       // Shopping: 1-2 times per week
-      if (Math.random() > 0.8) {
+      if (Math.random() > 0.9) {
         transactions.push({
           userId,
           amount: randAmount(300, 2000),

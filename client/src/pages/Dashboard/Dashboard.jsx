@@ -11,9 +11,7 @@ import KPICard from '@/components/dashboard/KPICard';
 import StressGauge from '@/components/dashboard/StressGauge';
 import ExpensePieChart from '@/components/dashboard/ExpensePieChart';
 import IncomeExpenseTrend from '@/components/dashboard/IncomeExpenseTrend';
-import RecentAlerts from '@/components/dashboard/RecentAlerts';
 import { predictions as predictionsApi, transactions as transactionsApi } from '@/services/api';
-import { useAlerts } from '@/context/AlertContext';
 import { formatCurrency, getStressBadgeClass } from '@/utils/helpers';
 
 export default function Dashboard() {
@@ -22,8 +20,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [runningPrediction, setRunningPrediction] = useState(false);
   const [error, setError] = useState(null);
-  const { alerts, markRead, dismiss } = useAlerts();
-
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
@@ -95,33 +91,41 @@ export default function Dashboard() {
 
       {/* Row 1: KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard
-          title="Monthly Income"
-          value={formatCurrency(monthlyIncome)}
-          icon={DollarSign}
-          trend="up"
-          color="teal"
-        />
-        <KPICard
-          title="Total Expenses"
-          value={formatCurrency(totalExpenses)}
-          icon={TrendingDown}
-          trend="down"
-          color="rose"
-        />
-        <KPICard
-          title="Savings Rate"
-          value={`${savingsRate}%`}
-          icon={PiggyBank}
-          trend={parseFloat(savingsRate) >= 20 ? 'up' : 'down'}
-          color={parseFloat(savingsRate) >= 20 ? 'teal' : 'amber'}
-        />
-        <KPICard
-          title="Stress Level"
-          value={stressLevel}
-          icon={Activity}
-          color={stressLevel.toLowerCase() === 'low' ? 'teal' : stressLevel.toLowerCase() === 'medium' ? 'amber' : 'rose'}
-        />
+        <div className="min-w-0">
+          <KPICard
+            title="Total Income"
+            value={formatCurrency(monthlyIncome)}
+            icon={DollarSign}
+            trend="up"
+            color="teal"
+          />
+        </div>
+        <div className="min-w-0">
+          <KPICard
+            title="Total Expenses"
+            value={formatCurrency(totalExpenses)}
+            icon={TrendingDown}
+            trend="down"
+            color="rose"
+          />
+        </div>
+        <div className="min-w-0">
+          <KPICard
+            title="Savings Rate"
+            value={`${savingsRate}%`}
+            icon={PiggyBank}
+            trend={parseFloat(savingsRate) >= 20 ? 'up' : 'down'}
+            color={parseFloat(savingsRate) >= 20 ? 'teal' : 'amber'}
+          />
+        </div>
+        <div className="min-w-0">
+          <KPICard
+            title="Stress Level"
+            value={stressLevel}
+            icon={Activity}
+            color={stressLevel.toLowerCase() === 'low' ? 'teal' : stressLevel.toLowerCase() === 'medium' ? 'amber' : 'rose'}
+          />
+        </div>
       </div>
 
       {/* Row 2: Stress Gauge + Expense Pie */}
@@ -141,11 +145,8 @@ export default function Dashboard() {
       {/* Row 3: Income vs Expense Trend */}
       <IncomeExpenseTrend data={trendData} />
 
-      {/* Row 4: Recent Alerts + Run Prediction */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <RecentAlerts alerts={alerts} onMarkRead={markRead} onDismiss={dismiss} />
-        </div>
+      {/* Row 4: Run Prediction */}
+      <div className="grid grid-cols-1 gap-6">
         <div className="glass-card p-6 flex flex-col items-center justify-center text-center">
           <div className="p-4 bg-teal/10 rounded-2xl mb-4">
             <Brain className="w-10 h-10 text-teal" />

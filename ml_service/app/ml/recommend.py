@@ -169,15 +169,4 @@ def identify_risk_factors(features: dict) -> List[str]:
     risk_scores.sort(key=lambda x: x[0], reverse=True)
     top_risks = [desc for _, desc in risk_scores[:3]]
 
-    # Pad with generic factors if fewer than 3
-    if len(top_risks) < 3:
-        generic = [
-            "Overall financial health appears stable",
-            "No significant risk factors detected",
-            "Financial metrics within healthy ranges",
-        ]
-        for g in generic:
-            if len(top_risks) < 3:
-                top_risks.append(g)
-
-    return top_risks[:3]
+    return top_risks

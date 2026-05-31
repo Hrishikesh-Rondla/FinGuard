@@ -22,9 +22,9 @@ export default function StressGauge({ stressScore = 0, stressLevel = 'Low', prob
   const remainingLength = circumference - filledLength;
 
   const probData = [
-    { label: 'Low', value: probabilities.low || probabilities[0] || 0, color: '#00D4AA' },
-    { label: 'Medium', value: probabilities.medium || probabilities[1] || 0, color: '#F59E0B' },
-    { label: 'High', value: probabilities.high || probabilities[2] || 0, color: '#F43F5E' },
+    { label: 'Low', value: probabilities.Low || probabilities.low || probabilities[0] || 0, color: '#00D4AA' },
+    { label: 'Medium', value: probabilities.Medium || probabilities.medium || probabilities[1] || 0, color: '#F59E0B' },
+    { label: 'High', value: probabilities.High || probabilities.high || probabilities[2] || 0, color: '#F43F5E' },
   ];
 
   return (
@@ -58,21 +58,12 @@ export default function StressGauge({ stressScore = 0, stressLevel = 'Low', prob
           {/* Center text */}
           <text
             x={cx}
-            y={cy - 15}
+            y={cy}
             textAnchor="middle"
-            className="fill-gray-100 text-2xl font-mono font-bold"
-            style={{ fontSize: '28px' }}
+            className="font-bold"
+            style={{ fontSize: '24px', fill: color }}
           >
-            {stressScore.toFixed(1)}
-          </text>
-          <text
-            x={cx}
-            y={cy + 5}
-            textAnchor="middle"
-            style={{ fontSize: '14px', fill: color }}
-            className="font-medium"
-          >
-            {stressLevel}
+            {stressLevel?.toUpperCase()}
           </text>
         </svg>
       </div>

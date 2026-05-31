@@ -84,6 +84,13 @@ export const transactions = {
   getTransactionSummary: async () => {
     return await api.get('/transactions/summary');
   },
+  uploadTransactions: async (formData) => {
+    return await api.post('/transactions/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
 };
 
 // ==================== PREDICTIONS ====================
@@ -99,21 +106,4 @@ export const predictions = {
   },
 };
 
-// ==================== ALERTS ====================
-export const alerts = {
-  getAlerts: async () => {
-    return await api.get('/alerts');
-  },
-  markAlertRead: async (id) => {
-    return await api.put(`/alerts/${id}/read`);
-  },
-  markAllRead: async () => {
-    return await api.put('/alerts/read-all');
-  },
-  dismissAlert: async (id) => {
-    return await api.delete(`/alerts/${id}`);
-  },
-};
-
 export default api;
-

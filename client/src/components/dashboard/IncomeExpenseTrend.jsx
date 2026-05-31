@@ -9,6 +9,7 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
+import { formatCurrency } from '@/utils/helpers';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -23,7 +24,7 @@ const CustomTooltip = ({ active, payload, label }) => {
             />
             <span className="text-xs text-gray-300">{item.name}:</span>
             <span className="text-xs font-mono text-gray-200">
-              ${item.value?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              {formatCurrency(item.value)}
             </span>
           </div>
         ))}
@@ -68,7 +69,7 @@ export default function IncomeExpenseTrend({ data = [] }) {
             axisLine={false}
             tickLine={false}
             tick={{ fill: '#94a3b8', fontSize: 12 }}
-            tickFormatter={(val) => `$${(val / 1000).toFixed(0)}k`}
+            tickFormatter={(val) => `₹${(val / 1000).toFixed(0)}k`}
           />
           <Tooltip content={<CustomTooltip />} />
           <Area

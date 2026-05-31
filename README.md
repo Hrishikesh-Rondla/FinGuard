@@ -115,8 +115,7 @@ Once logged in:
 2. Click **"Run Prediction"** — The system aggregates your transactions, sends them to the ML model, and displays your stress level with recommendations
 3. **Transactions** — Add/edit/delete financial transactions
 4. **Predictions** — View your prediction history and stress trends
-5. **Alerts** — Review all financial warnings and tips
-6. **Profile** — Update your monthly income
+5. **Profile** — Update your monthly income
 
 ---
 
@@ -156,9 +155,9 @@ FinGuard/
 │   │   │   ├── layout/     # Sidebar, Navbar, AppLayout
 │   │   │   ├── dashboard/  # KPICard, StressGauge, Charts
 │   │   │   ├── transactions/  # TransactionTable, TransactionForm
-│   │   │   └── alerts/     # AlertBanner, RecommendationCard
+│   │   │   └── alerts/     # RecommendationCard
 │   │   ├── pages/          # Login, Register, Dashboard, Transactions,
-│   │   │                   # Predictions, Alerts, Profile
+│   │   │                   # Predictions, Profile
 │   │   ├── context/        # AuthContext, AlertContext
 │   │   ├── services/       # api.js (Axios with JWT interceptors)
 │   │   └── App.jsx         # Root component & routing
@@ -168,9 +167,9 @@ FinGuard/
 ├── server/                 # Express.js Backend API
 │   ├── config/db.js        # MongoDB connection
 │   ├── controllers/        # authController, transactionController,
-│   │                       # predictionController, alertController
+│   │                       # predictionController
 │   ├── middleware/          # JWT auth & error handling
-│   ├── models/             # User, Transaction, Prediction, Alert
+│   ├── models/             # User, Transaction, Prediction
 │   ├── routes/             # API route definitions
 │   ├── services/mlService.js  # Axios client for FastAPI ML service
 │   ├── seed.js             # Demo data seeder
@@ -218,7 +217,6 @@ FinGuard/
 - **Stress Level**: Low (0), Medium (1), High (2)
 - **Probabilities**: Confidence for each class
 - **Recommendations**: 3-5 personalized financial tips
-- **Risk Factors**: Top 3 contributing risk indicators
 
 ### Models Trained & Compared
 | Model | Accuracy | F1 Score | ROC-AUC |
@@ -259,14 +257,6 @@ FinGuard/
 | POST | `/run` | Run stress prediction |
 | GET | `/history` | Prediction history |
 | GET | `/latest` | Latest prediction |
-
-### Alerts (`/api/alerts`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | All alerts |
-| PUT | `/:id/read` | Mark as read |
-| PUT | `/read-all` | Mark all read |
-| DELETE | `/:id` | Dismiss alert |
 
 ### ML Service (`localhost:8000`)
 | Method | Endpoint | Description |

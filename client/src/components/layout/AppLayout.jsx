@@ -1,6 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { AlertProvider } from '@/context/AlertContext';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import { Loader2 } from 'lucide-react';
@@ -24,16 +23,14 @@ export default function AppLayout() {
   }
 
   return (
-    <AlertProvider>
-      <div className="min-h-screen bg-navy-900">
-        <Sidebar />
-        <div className="lg:ml-64 min-h-screen flex flex-col">
-          <Navbar />
-          <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 lg:pb-8">
-            <Outlet />
-          </main>
-        </div>
+    <div className="min-h-screen bg-navy-900">
+      <Sidebar />
+      <div className="lg:ml-64 min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 lg:pb-8">
+          <Outlet />
+        </main>
       </div>
-    </AlertProvider>
+    </div>
   );
 }

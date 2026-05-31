@@ -6,7 +6,6 @@ import Register from '@/pages/Auth/Register';
 import Dashboard from '@/pages/Dashboard/Dashboard';
 import Transactions from '@/pages/Transactions/Transactions';
 import Predictions from '@/pages/Predictions/Predictions';
-import Alerts from '@/pages/Alerts/Alerts';
 import Profile from '@/pages/Profile/Profile';
 
 export default function App() {
@@ -23,7 +22,6 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/predictions" element={<Predictions />} />
-            <Route path="/alerts" element={<Alerts />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
 

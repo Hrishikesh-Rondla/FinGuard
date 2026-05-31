@@ -6,7 +6,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { getCategoryColor } from '@/utils/helpers';
+import { getCategoryColor, formatCurrency } from '@/utils/helpers';
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -15,7 +15,7 @@ const CustomTooltip = ({ active, payload }) => {
       <div className="glass-card px-4 py-3 shadow-lg">
         <p className="text-sm font-medium text-gray-200">{data.name}</p>
         <p className="text-sm font-mono text-teal">
-          ${data.value?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          {formatCurrency(data.value)}
         </p>
       </div>
     );

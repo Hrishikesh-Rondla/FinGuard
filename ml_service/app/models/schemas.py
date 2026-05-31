@@ -73,9 +73,6 @@ class PredictionResponse(BaseModel):
     recommendations: List[str] = Field(
         ..., description="Personalized financial recommendations"
     )
-    top_risk_factors: List[str] = Field(
-        ..., description="Top 3 risk factors for the user"
-    )
     model_used: str = Field(..., description="Name of the ML model used for prediction")
 
 
@@ -94,3 +91,11 @@ class ModelInfoResponse(BaseModel):
     accuracy: float
     f1_score: float
     training_date: str
+
+class CategoryInput(BaseModel):
+    """Input schema for the /categorize-batch endpoint."""
+    descriptions: List[str] = Field(..., description="List of transaction descriptions to categorize")
+
+class CategoryResponse(BaseModel):
+    """Response schema for the /categorize-batch endpoint."""
+    categories: List[str] = Field(..., description="List of predicted categories, one for each description")

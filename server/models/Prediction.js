@@ -22,7 +22,6 @@ const predictionSchema = new mongoose.Schema({
     High: { type: Number },
   },
   recommendations: [String],
-  topRiskFactors: [String],
   featureSnapshot: {
     type: mongoose.Schema.Types.Mixed,
   },

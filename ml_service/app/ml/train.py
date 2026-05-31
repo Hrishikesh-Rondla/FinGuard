@@ -78,8 +78,8 @@ def create_stress_labels(df: pd.DataFrame) -> pd.Series:
     medium_mask = (
         ((df["DebtRatio"] >= 0.35) & (df["DebtRatio"] <= 0.5))
         | (
-            (df["RevolvingUtilizationOfUnsecuredLines"] >= 0.6)
-            & (df["RevolvingUtilizationOfUnsecuredLines"] <= 0.9)
+            (df["RevolvingUtilizationOfUnsecuredLines"] >= 0.85)
+            & (df["RevolvingUtilizationOfUnsecuredLines"] <= 0.95)
         )
         | (df["NumberOfTime30-59DaysPastDueNotWorse"] > 0)
     )
@@ -87,9 +87,9 @@ def create_stress_labels(df: pd.DataFrame) -> pd.Series:
 
     # High (2) — overrides Medium
     high_mask = (
-        (df["SeriousDlqin2yrs"] == 1)
-        | (df["DebtRatio"] > 0.5)
-        | (df["RevolvingUtilizationOfUnsecuredLines"] > 0.9)
+        (df["DebtRatio"] > 0.50)
+        | (df["RevolvingUtilizationOfUnsecuredLines"] > 0.95)
+        | ((df["SeriousDlqin2yrs"] == 1) & (df["DebtRatio"] > 0.4))
     )
     labels[high_mask] = 2
 

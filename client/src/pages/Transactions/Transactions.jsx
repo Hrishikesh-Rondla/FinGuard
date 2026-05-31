@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Upload, FileText } from 'lucide-react';
 import TransactionTable from '@/components/transactions/TransactionTable';
 import TransactionForm from '@/components/transactions/TransactionForm';
+import BankStatementUpload from '@/components/transactions/BankStatementUpload';
 import { transactions as txApi } from '@/services/api';
 
 export default function Transactions() {
@@ -14,6 +15,7 @@ export default function Transactions() {
   const [editData, setEditData] = useState(null);
   const [filters, setFilters] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState('manual'); // 'manual' or 'upload'
 
   const fetchTransactions = useCallback(async (page = 1, filterOverrides) => {
     try {
@@ -22,10 +24,11 @@ export default function Transactions() {
       const activeFilters = filterOverrides || filters;
       const data = await txApi.getTransactions(page, 10, activeFilters);
       setTransactionList(data.transactions || data.data || []);
+      const pageInfo = data.pagination || {};
       setPagination({
-        page: data.page || data.currentPage || page,
-        totalPages: data.totalPages || data.total_pages || 1,
-        total: data.total || data.totalCount || 0,
+        page: pageInfo.page || data.page || page,
+        totalPages: pageInfo.pages || data.totalPages || 1,
+        total: pageInfo.total || data.total || 0,
       });
       setCurrentPage(page);
     } catch (err) {
@@ -37,7 +40,7 @@ export default function Transactions() {
 
   useEffect(() => {
     fetchTransactions(1);
-  }, []);
+  }, [fetchTransactions]);
 
   const handleAdd = async (data) => {
     try {
@@ -96,25 +99,49 @@ export default function Transactions() {
     setEditData(null);
   };
 
+  const handleUploadComplete = () => {
+    setSuccess('Bank statement uploaded and saved successfully!');
+    setTimeout(() => setSuccess(''), 3000);
+    setActiveTab('manual');
+    fetchTransactions(1);
+  };
+
   return (
     <div id="transactions-page" className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-gray-100">All Transactions</h2>
           <p className="text-sm text-gray-500">Manage your income and expenses</p>
         </div>
-        <button
-          id="add-transaction-btn"
-          onClick={() => {
-            setEditData(null);
-            setFormOpen(true);
-          }}
-          className="btn-primary flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Transaction
-        </button>
+        
+        {/* Tabs */}
+        <div className="flex bg-gray-900 rounded-lg p-1 w-full sm:w-auto">
+          <button
+            onClick={() => setActiveTab('manual')}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+              activeTab === 'manual' 
+                ? 'bg-gray-800 text-white shadow-sm' 
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span className="hidden sm:inline">Manual Entry</span>
+            <span className="sm:hidden">Manual</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('upload')}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+              activeTab === 'upload' 
+                ? 'bg-gray-800 text-teal shadow-sm' 
+                : 'text-gray-400 hover:text-teal'
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            <span className="hidden sm:inline">Bank Upload</span>
+            <span className="sm:hidden">Upload</span>
+          </button>
+        </div>
       </div>
 
       {/* Feedback */}
@@ -129,29 +156,50 @@ export default function Transactions() {
         </div>
       )}
 
-      {/* Loading */}
-      {loading && transactionList.length === 0 ? (
-        <div className="flex items-center justify-center min-h-[40vh]">
-          <Loader2 className="w-8 h-8 text-teal animate-spin" />
-        </div>
-      ) : (
-        <TransactionTable
-          transactions={transactionList}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          pagination={pagination}
-          onPageChange={handlePageChange}
-          onFilterChange={handleFilterChange}
-        />
-      )}
+      {/* Content based on Tab */}
+      {activeTab === 'manual' ? (
+        <>
+          <div className="flex justify-end">
+            <button
+              id="add-transaction-btn"
+              onClick={() => {
+                setEditData(null);
+                setFormOpen(true);
+              }}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Transaction
+            </button>
+          </div>
 
-      {/* Transaction Form Modal */}
-      <TransactionForm
-        isOpen={formOpen}
-        onClose={handleFormClose}
-        onSubmit={editData ? handleUpdate : handleAdd}
-        initialData={editData}
-      />
+          {/* Loading */}
+          {loading && transactionList.length === 0 ? (
+            <div className="flex items-center justify-center min-h-[40vh]">
+              <Loader2 className="w-8 h-8 text-teal animate-spin" />
+            </div>
+          ) : (
+            <TransactionTable
+              transactions={transactionList}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              pagination={pagination}
+              onPageChange={handlePageChange}
+              onFilterChange={handleFilterChange}
+            />
+          )}
+
+          {/* Transaction Form Modal */}
+          <TransactionForm
+            isOpen={formOpen}
+            onClose={handleFormClose}
+            onSubmit={editData ? handleUpdate : handleAdd}
+            initialData={editData}
+          />
+        </>
+      ) : (
+        <BankStatementUpload onUploadComplete={handleUploadComplete} />
+      )}
     </div>
   );
 }

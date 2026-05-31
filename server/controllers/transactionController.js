@@ -161,7 +161,7 @@ const deleteTransaction = async (req, res, next) => {
 };
 
 /**
- * @desc    Get transaction summary for the last 30 days
+ * @desc    Get transaction summary for the last 30 days and 6-month trend
  * @route   GET /api/transactions/summary
  * @access  Private
  */
@@ -170,56 +170,107 @@ const getTransactionSummary = async (req, res, next) => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Aggregate by category and type
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 12);
+    sixMonthsAgo.setDate(1); // Start of the month
+
+    // 1. Category aggregation for expenses (all-time)
     const categoryAgg = await Transaction.aggregate([
       {
         $match: {
           userId: req.user._id,
-          date: { $gte: thirtyDaysAgo },
+          type: 'expense',
         },
       },
       {
         $group: {
-          _id: { category: '$category', type: '$type' },
-          total: { $sum: '$amount' },
-          count: { $sum: 1 },
+          _id: '$category',
+          amount: { $sum: '$amount' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          category: '$_id',
+          amount: 1,
         },
       },
     ]);
 
-    // Aggregate totals by type
+    // 2. Type aggregation for totals (all-time)
     const typeAgg = await Transaction.aggregate([
       {
         $match: {
           userId: req.user._id,
-          date: { $gte: thirtyDaysAgo },
         },
       },
       {
         $group: {
           _id: '$type',
           total: { $sum: '$amount' },
-          count: { $sum: 1 },
         },
       },
     ]);
 
-    // Build category totals map
-    const categoryTotals = {};
-    categoryAgg.forEach((item) => {
-      const cat = item._id.category;
-      if (!categoryTotals[cat]) {
-        categoryTotals[cat] = { total: 0, count: 0 };
-      }
-      categoryTotals[cat].total += item.total;
-      categoryTotals[cat].count += item.count;
-    });
+    // 3. Monthly trend aggregation (All-Time)
+    const trendAgg = await Transaction.aggregate([
+      {
+        $match: {
+          userId: req.user._id,
+          type: { $in: ['income', 'expense'] },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$date' },
+            month: { $month: '$date' },
+            type: '$type',
+          },
+          total: { $sum: '$amount' },
+        },
+      },
+    ]);
 
     // Build type totals
     const typeTotals = { income: 0, expense: 0, savings: 0, debt: 0 };
     typeAgg.forEach((item) => {
       typeTotals[item._id] = item.total;
     });
+
+    // Build dynamic monthly trend
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const trendMap = {};
+
+    trendAgg.forEach((item) => {
+      const year = item._id.year;
+      const month = item._id.month;
+      const key = `${year}-${month.toString().padStart(2, '0')}`; // YYYY-MM for sorting
+
+      if (!trendMap[key]) {
+        trendMap[key] = {
+          month: monthNames[month - 1],
+          year: year,
+          income: 0,
+          expenses: 0,
+          sortKey: key,
+        };
+      }
+
+      if (item._id.type === 'income') {
+        trendMap[key].income = item.total;
+      } else if (item._id.type === 'expense') {
+        trendMap[key].expenses = item.total;
+      }
+    });
+
+    // Sort chronologically and take the last 12 months (or keep all, Recharts handles it)
+    let monthlyTrend = Object.values(trendMap).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    // If they have more than 12 months, just show the most recent 12 to prevent overcrowding
+    if (monthlyTrend.length > 12) {
+      monthlyTrend = monthlyTrend.slice(monthlyTrend.length - 12);
+    }
+
 
     res.status(200).json({
       success: true,
@@ -228,7 +279,8 @@ const getTransactionSummary = async (req, res, next) => {
           from: thirtyDaysAgo,
           to: new Date(),
         },
-        categoryTotals,
+        expensesByCategory: categoryAgg,
+        monthlyTrend: monthlyTrend,
         totalIncome: typeTotals.income,
         totalExpenses: typeTotals.expense,
         totalSavings: typeTotals.savings,
@@ -242,10 +294,116 @@ const getTransactionSummary = async (req, res, next) => {
   }
 };
 
+const axios = require('axios');
+const { parse } = require('csv-parse/sync');
+
+/**
+ * @desc    Upload and parse bank statement CSV
+ * @route   POST /api/transactions/upload
+ * @access  Private
+ */
+const uploadTransactions = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const fileContent = req.file.buffer.toString('utf-8');
+    const records = parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+    });
+
+    if (records.length === 0) {
+      return res.status(400).json({ success: false, message: 'CSV file is empty or invalid' });
+    }
+
+    // Flexible column mapping
+    const parsedTransactions = [];
+    const descriptions = [];
+
+    for (const record of records) {
+      const keys = Object.keys(record);
+      // Find possible column names (case-insensitive)
+      const dateKey = keys.find(k => k.toLowerCase().includes('date'));
+      const descKey = keys.find(k => k.toLowerCase().includes('desc') || k.toLowerCase().includes('particular'));
+      const amtKey = keys.find(k => k.toLowerCase().includes('amount') || k.toLowerCase().includes('withdrawal') || k.toLowerCase().includes('deposit'));
+      const typeKey = keys.find(k => k.toLowerCase().includes('type') || k.toLowerCase().includes('cr/dr'));
+
+      if (!dateKey || !descKey || !amtKey) continue;
+
+      let amount = parseFloat(record[amtKey].replace(/,/g, ''));
+      if (isNaN(amount)) continue;
+
+      let type = 'expense';
+      let rawType = record[typeKey] ? record[typeKey].toLowerCase() : '';
+      
+      // Determine type based on amount sign or type column
+      if (amount < 0 || rawType.includes('dr') || rawType.includes('debit')) {
+        type = 'expense';
+        amount = Math.abs(amount);
+      } else if (rawType.includes('cr') || rawType.includes('credit') || record[amtKey].toLowerCase().includes('deposit')) {
+        type = 'income';
+      }
+
+      parsedTransactions.push({
+        date: new Date(record[dateKey]),
+        description: record[descKey],
+        amount,
+        type,
+      });
+      descriptions.push(record[descKey]);
+    }
+
+    // Call ML service to categorize
+    let categories = [];
+    try {
+      const mlResponse = await axios.post('http://localhost:8000/categorize-batch', {
+        descriptions
+      });
+      categories = mlResponse.data.categories;
+    } catch (mlError) {
+      console.error('ML Categorization failed:', mlError.message);
+      // Fallback
+      categories = parsedTransactions.map(() => 'other');
+    }
+
+    // Merge categories and fix types
+    const finalTransactions = parsedTransactions.map((t, idx) => {
+      const category = categories[idx] || 'other';
+      let type = t.type;
+      
+      // Override type based on ML category to prevent savings/debt from being classed as generic expenses
+      if (category === 'savings') {
+        type = 'savings';
+      } else if (category === 'debt_payment') {
+        type = 'debt';
+      }
+
+      return {
+        userId: req.user._id,
+        ...t,
+        category,
+        type,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      data: finalTransactions,
+      message: 'Transactions parsed and categorized successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getTransactions,
   addTransaction,
   updateTransaction,
   deleteTransaction,
   getTransactionSummary,
+  uploadTransactions,
 };
