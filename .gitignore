@@ -22,7 +22,6 @@ venv/
 *.egg
 
 # ML artifacts (large files)
-ml_service/app/ml/artifacts/*.joblib
 ml_service/data/*.csv
 
 # Dataset files

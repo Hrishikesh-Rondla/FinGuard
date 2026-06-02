@@ -40,17 +40,11 @@ User → React Frontend → Express API → MongoDB (store transactions)
 - **MongoDB** running locally (as a service or via Docker)
 - **Git**
 
-### Step 0: Clone & Setup Dataset
+### Step 0: Clone the Repository
 
 ```bash
 git clone https://github.com/Hrishikesh-Rondla/FinGuard.git
 cd FinGuard
-```
-
-> **Important**: Download the [Give Me Some Credit dataset](https://www.kaggle.com/c/GiveMeSomeCredit/data) from Kaggle and place `cs-training.csv` inside `ml_service/data/`:
-```bash
-mkdir -p ml_service/data
-# Copy cs-training.csv into ml_service/data/
 ```
 
 ### Step 1: Start the ML Service (Terminal 1)
@@ -61,7 +55,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-> On first startup, the service will automatically train the model using the dataset (~15-30 seconds). You'll see training metrics printed to the console. Subsequent startups will skip training and load the saved model instantly.
+> **Note**: The trained `RandomForest` model artifacts are included in the repository! You do not need to download any dataset or train the model yourself. The service will load the pre-trained model instantly.
 
 **Verify**: Open `http://localhost:8000/health` in your browser — you should see:
 ```json
@@ -304,7 +298,7 @@ VITE_API_BASE_URL=http://localhost:5000/api
 | Issue | Solution |
 |-------|----------|
 | `MongoDB connection failed` | Ensure MongoDB is running (`mongod` or check Windows Services for "MongoDB") |
-| `ML service: model artifacts not found` | Place `cs-training.csv` in `ml_service/data/` and restart the service |
+| `ML service: model artifacts not found` | Ensure you pulled all `.joblib` files from GitHub and they reside in `ml_service/app/ml/artifacts/`
 | `CORS errors in browser` | Make sure all 3 services are running on correct ports (3000, 5000, 8000) |
 | `npm run seed` fails | Ensure MongoDB is running and `MONGO_URI` in `server/.env` is correct |
 | Frontend shows blank page | Check browser console for errors; ensure backend is running on port 5000 |
