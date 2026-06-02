@@ -2,6 +2,12 @@
 
 A full-stack, ML-integrated web application that predicts financial stress levels and generates personalized early warning alerts with actionable recommendations.
 
+### Key Features
+- **Machine Learning Integration**: Predicts financial stress using a pre-trained RandomForest model.
+- **Multi-Format Bank Statement Uploads**: Upload CSV, Excel (.xlsx/.xls), or PDF bank statements. The system parses and auto-categorizes transactions seamlessly.
+- **Role-Based Access Control (RBAC)**: Includes a dedicated, isolated Superadmin dashboard to manage users and view system-wide usage statistics.
+- **Interactive Dashboards**: Real-time charts for expense tracking, income trends, and actionable financial recommendations.
+
 ---
 
 ## 📐 Architecture
@@ -107,7 +113,7 @@ Password: password123
 Once logged in:
 1. **Dashboard** — View KPIs, expense charts, and stress gauge
 2. Click **"Run Prediction"** — The system aggregates your transactions, sends them to the ML model, and displays your stress level with recommendations
-3. **Transactions** — Add/edit/delete financial transactions
+3. **Transactions** — Add/edit/delete financial transactions. You can also upload your bank statements directly (supports `.csv`, `.xlsx`, `.xls`, and `.pdf`).
 4. **Predictions** — View your prediction history and stress trends
 5. **Profile** — Update your monthly income
 
@@ -132,9 +138,17 @@ This starts all services automatically:
 ## 🔑 Demo Credentials
 
 After running the seed script (`npm run seed` in the server directory):
+
+**Standard User:**
 ```
 Email:    demo@finguard.com
 Password: password123
+```
+
+**Superadmin:**
+```
+Email:    admin@finguard.com
+Password: admin123
 ```
 
 ---
@@ -148,11 +162,11 @@ FinGuard/
 │   │   ├── components/     # Reusable UI components
 │   │   │   ├── layout/     # Sidebar, Navbar, AppLayout
 │   │   │   ├── dashboard/  # KPICard, StressGauge, Charts
-│   │   │   ├── transactions/  # TransactionTable, TransactionForm
+│   │   │   ├── transactions/  # TransactionTable, TransactionForm, BankStatementUpload
 │   │   │   └── alerts/     # RecommendationCard
 │   │   ├── pages/          # Login, Register, Dashboard, Transactions,
-│   │   │                   # Predictions, Profile
-│   │   ├── context/        # AuthContext, AlertContext
+│   │   │                   # Predictions, Profile, AdminPanel (Superadmin)
+│   │   ├── context/        # AuthContext (Handles user roles), AlertContext
 │   │   ├── services/       # api.js (Axios with JWT interceptors)
 │   │   └── App.jsx         # Root component & routing
 │   ├── .env                # VITE_API_BASE_URL
@@ -161,10 +175,10 @@ FinGuard/
 ├── server/                 # Express.js Backend API
 │   ├── config/db.js        # MongoDB connection
 │   ├── controllers/        # authController, transactionController,
-│   │                       # predictionController
-│   ├── middleware/          # JWT auth & error handling
-│   ├── models/             # User, Transaction, Prediction
-│   ├── routes/             # API route definitions
+│   │                       # predictionController, adminController
+│   ├── middleware/          # JWT auth, Role checks & error handling
+│   ├── models/             # User (w/ Roles), Transaction, Prediction
+│   ├── routes/             # API route definitions (including /admin)
 │   ├── services/mlService.js  # Axios client for FastAPI ML service
 │   ├── seed.js             # Demo data seeder
 │   ├── .env                # PORT, MONGO_URI, JWT_SECRET, ML_SERVICE_URL
