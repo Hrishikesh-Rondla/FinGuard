@@ -297,8 +297,11 @@ const getTransactionSummary = async (req, res, next) => {
 const axios = require('axios');
 const { parse } = require('csv-parse/sync');
 
+const xlsx = require('xlsx');
+const pdfParse = require('pdf-parse');
+
 /**
- * @desc    Upload and parse bank statement CSV
+ * @desc    Upload and parse bank statement (CSV, Excel, PDF)
  * @route   POST /api/transactions/upload
  * @access  Private
  */
@@ -308,15 +311,46 @@ const uploadTransactions = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
-    const fileContent = req.file.buffer.toString('utf-8');
-    const records = parse(fileContent, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-    });
+    const originalName = req.file.originalname.toLowerCase();
+    let records = [];
+
+    if (originalName.endsWith('.csv') || req.file.mimetype === 'text/csv') {
+      const fileContent = req.file.buffer.toString('utf-8');
+      records = parse(fileContent, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+      });
+    } else if (originalName.endsWith('.xlsx') || originalName.endsWith('.xls')) {
+      const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      records = xlsx.utils.sheet_to_json(sheet);
+    } else if (originalName.endsWith('.pdf') || req.file.mimetype === 'application/pdf') {
+      const pdfData = await pdfParse(req.file.buffer);
+      const lines = pdfData.text.split('\n');
+      
+      // Heuristic regex: matches Date, Description, and Amount (with optional CR/DR)
+      // e.g., "12/05/2023 Grocery Store 150.00"
+      const pdfRegex = /(\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4})\s+(.+?)\s+([-+]?[\d,]*\.\d{2})(?:\s+(CR|DR|cr|dr))?/i;
+      
+      for (const line of lines) {
+        const match = line.match(pdfRegex);
+        if (match) {
+          records.push({
+            Date: match[1],
+            Description: match[2].trim(),
+            Amount: match[3],
+            Type: match[4] || ''
+          });
+        }
+      }
+    } else {
+      return res.status(400).json({ success: false, message: 'Unsupported file format. Please upload CSV, Excel, or PDF.' });
+    }
 
     if (records.length === 0) {
-      return res.status(400).json({ success: false, message: 'CSV file is empty or invalid' });
+      return res.status(400).json({ success: false, message: 'File is empty, invalid, or no transactions could be parsed.' });
     }
 
     // Flexible column mapping

@@ -59,6 +59,8 @@ const register = async (req, res, next) => {
           name: user.name,
           email: user.email,
           monthlyIncome: user.monthlyIncome,
+          role: user.role,
+          isActive: user.isActive,
           createdAt: user.createdAt,
         },
         token,
@@ -112,6 +114,16 @@ const login = async (req, res, next) => {
       });
     }
 
+    // Check if account is active
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        data: null,
+        message: 'Account suspended',
+        error: 'Your account has been suspended by an administrator',
+      });
+    }
+
     // Generate token
     const token = generateToken(user._id);
 
@@ -123,6 +135,8 @@ const login = async (req, res, next) => {
           name: user.name,
           email: user.email,
           monthlyIncome: user.monthlyIncome,
+          role: user.role,
+          isActive: user.isActive,
           createdAt: user.createdAt,
         },
         token,

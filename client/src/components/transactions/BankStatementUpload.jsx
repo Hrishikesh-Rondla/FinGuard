@@ -13,12 +13,18 @@ export default function BankStatementUpload({ onUploadComplete }) {
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
-    if (selected && selected.type === 'text/csv') {
-      setFile(selected);
-      setError(null);
-    } else {
-      setError('Please select a valid CSV file.');
-      setFile(null);
+    if (selected) {
+      const validTypes = ['text/csv', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/pdf'];
+      const validExtensions = ['.csv', '.xlsx', '.xls', '.pdf'];
+      const ext = selected.name.substring(selected.name.lastIndexOf('.')).toLowerCase();
+      
+      if (validTypes.includes(selected.type) || validExtensions.includes(ext)) {
+        setFile(selected);
+        setError(null);
+      } else {
+        setError('Please select a valid CSV, Excel, or PDF file.');
+        setFile(null);
+      }
     }
   };
 
@@ -35,7 +41,7 @@ export default function BankStatementUpload({ onUploadComplete }) {
       const data = await transactionsApi.uploadTransactions(formData);
       setParsedTransactions(data);
     } catch (err) {
-      setError(err.message || 'Failed to parse and categorize CSV.');
+      setError(err.message || 'Failed to parse and categorize file.');
     } finally {
       setLoading(false);
     }
@@ -84,19 +90,21 @@ export default function BankStatementUpload({ onUploadComplete }) {
     <div className="space-y-6">
       {!parsedTransactions.length ? (
         <div className="glass-card p-6">
-          <h3 className="text-lg font-medium text-gray-200 mb-4">Upload Bank Statement (CSV)</h3>
+          <h3 className="text-lg font-medium text-gray-200 mb-4">Upload Bank Statement</h3>
           
           <div className="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
             <Upload className="w-10 h-10 text-teal mx-auto mb-4" />
             <p className="text-sm text-gray-400 mb-4">
-              Upload your bank statement in CSV format. The ML model will automatically categorize your transactions.
+              Upload your bank statement in CSV, Excel (.xlsx/.xls), or PDF format. The ML model will automatically categorize your transactions.
               <br />
-              Expected columns: Date, Description, Amount, Type (Cr/Dr).
+              <span className="text-xs text-gray-500 mt-2 block">
+                Note: PDF parsing is experimental and may vary by bank format.
+              </span>
             </p>
             
             <input
               type="file"
-              accept=".csv"
+              accept=".csv,.xlsx,.xls,.pdf"
               onChange={handleFileChange}
               ref={fileInputRef}
               className="hidden"
@@ -106,9 +114,9 @@ export default function BankStatementUpload({ onUploadComplete }) {
               htmlFor="csv-upload"
               className="btn-primary inline-block cursor-pointer"
             >
-              Select CSV File
+              Select File
             </label>
-            {file && <p className="mt-4 text-sm text-teal">{file.name}</p>}
+            {file && <p className="mt-4 text-sm text-teal font-medium">Selected: {file.name}</p>}
           </div>
 
           {error && (

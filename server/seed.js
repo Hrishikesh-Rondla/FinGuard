@@ -53,6 +53,16 @@ async function seed() {
     });
     console.log(`Created demo user: ${user.email}`);
 
+    // Create superadmin user
+    const admin = await User.create({
+      name: 'Super Admin',
+      email: 'admin@finguard.com',
+      passwordHash: 'admin123',
+      monthlyIncome: 0,
+      role: 'superadmin',
+    });
+    console.log(`Created admin user: ${admin.email}`);
+
     const transactions = [];
     const userId = user._id;
 

@@ -33,6 +33,15 @@ const protect = async (req, res, next) => {
       });
     }
 
+    if (!req.user.isActive) {
+      return res.status(403).json({
+        success: false,
+        data: null,
+        message: 'Account suspended',
+        error: 'Your account has been suspended by an administrator',
+      });
+    }
+
     next();
   } catch (error) {
     return res.status(401).json({
@@ -44,4 +53,17 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+const requireAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'superadmin') {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      data: null,
+      message: 'Not authorized as admin',
+      error: 'Admin privileges required',
+    });
+  }
+};
+
+module.exports = { protect, requireAdmin };

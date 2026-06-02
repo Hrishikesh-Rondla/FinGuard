@@ -105,5 +105,17 @@ export const predictions = {
     return await api.get('/predictions/latest');
   },
 };
+// ==================== ADMIN ====================
+export const admin = {
+  getUsersAndStats: async () => {
+    return await api.get('/admin/users');
+  },
+  toggleUserStatus: async (id) => {
+    return await api.put(`/admin/users/${id}/suspend`);
+  },
+  deleteUser: async (id) => {
+    return await api.delete(`/admin/users/${id}`);
+  },
+};
 
 export default api;

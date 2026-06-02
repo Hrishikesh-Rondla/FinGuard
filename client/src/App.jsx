@@ -8,6 +8,33 @@ import Transactions from '@/pages/Transactions/Transactions';
 import Predictions from '@/pages/Predictions/Predictions';
 import Profile from '@/pages/Profile/Profile';
 
+import AdminPanel from '@/pages/Admin/AdminPanel';
+import { useAuth } from '@/context/AuthContext';
+
+function AdminRoute({ children }) {
+  const { user } = useAuth();
+  if (user?.role !== 'superadmin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+}
+
+function UserRoute({ children }) {
+  const { user } = useAuth();
+  if (user?.role === 'superadmin') {
+    return <Navigate to="/admin" replace />;
+  }
+  return children;
+}
+
+function DefaultRoute() {
+  const { user } = useAuth();
+  if (user?.role === 'superadmin') {
+    return <Navigate to="/admin" replace />;
+  }
+  return <Navigate to="/dashboard" replace />;
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -19,14 +46,19 @@ export default function App() {
 
           {/* Protected Routes */}
           <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/predictions" element={<Predictions />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/dashboard" element={<UserRoute><Dashboard /></UserRoute>} />
+            <Route path="/transactions" element={<UserRoute><Transactions /></UserRoute>} />
+            <Route path="/predictions" element={<UserRoute><Predictions /></UserRoute>} />
+            <Route path="/profile" element={<UserRoute><Profile /></UserRoute>} />
+            <Route path="/admin" element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            } />
           </Route>
 
           {/* Default redirect */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<DefaultRoute />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -8,6 +8,7 @@ const PAGE_TITLES = {
   '/transactions': 'Transactions',
   '/predictions': 'Predictions',
   '/profile': 'Profile',
+  '/admin': 'Superadmin Panel',
 };
 
 export default function Navbar() {

@@ -8,7 +8,9 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 
-const navItems = [
+import { useAuth } from '@/context/AuthContext';
+
+const baseNavItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/transactions', label: 'Transactions', icon: Receipt },
   { to: '/predictions', label: 'Predictions', icon: Brain },
@@ -17,6 +19,11 @@ const navItems = [
 
 export default function Sidebar() {
   const location = useLocation();
+  const { user } = useAuth();
+  
+  const navItems = user?.role === 'superadmin' 
+    ? [{ to: '/admin', label: 'Admin Panel', icon: Shield }]
+    : baseNavItems;
 
   return (
     <>
