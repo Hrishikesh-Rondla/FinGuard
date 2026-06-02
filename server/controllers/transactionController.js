@@ -440,7 +440,8 @@ const uploadTransactions = async (req, res, next) => {
     // Call ML service to categorize
     let categories = [];
     try {
-      const mlResponse = await axios.post('http://localhost:8000/categorize-batch', {
+      const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+      const mlResponse = await axios.post(`${mlServiceUrl}/categorize-batch`, {
         descriptions
       });
       categories = mlResponse.data.categories;
