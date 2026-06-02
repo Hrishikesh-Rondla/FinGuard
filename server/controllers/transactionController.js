@@ -325,7 +325,42 @@ const uploadTransactions = async (req, res, next) => {
       const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
-      records = xlsx.utils.sheet_to_json(sheet);
+      
+      // Parse as 2D array with formatted strings
+      const rawRows = xlsx.utils.sheet_to_json(sheet, { header: 1, raw: false });
+      let headerRowIndex = -1;
+      let headers = [];
+
+      for (let i = 0; i < rawRows.length; i++) {
+        const row = rawRows[i] || [];
+        const rowString = row.join(' ').toLowerCase();
+        if (rowString.includes('date') && (rowString.includes('desc') || rowString.includes('particular') || rowString.includes('narration') || rowString.includes('amount') || rowString.includes('withdrawal') || rowString.includes('deposit'))) {
+          headerRowIndex = i;
+          headers = row.map(h => String(h || '').trim());
+          break;
+        }
+      }
+
+      if (headerRowIndex !== -1 && headers.length > 0) {
+        // Map subsequent rows into objects using the found headers
+        for (let i = headerRowIndex + 1; i < rawRows.length; i++) {
+          const row = rawRows[i];
+          if (!row || row.length === 0) continue;
+          
+          let obj = {};
+          let hasData = false;
+          for (let j = 0; j < headers.length; j++) {
+            if (headers[j]) {
+              obj[headers[j]] = row[j];
+              if (row[j] !== undefined && row[j] !== '') hasData = true;
+            }
+          }
+          if (hasData) records.push(obj);
+        }
+      } else {
+        // Fallback to default if no clear header row found
+        records = xlsx.utils.sheet_to_json(sheet, { raw: false });
+      }
     } else if (originalName.endsWith('.pdf') || req.file.mimetype === 'application/pdf') {
       const pdfData = await pdfParse(req.file.buffer);
       const lines = pdfData.text.split('\n');
@@ -361,25 +396,37 @@ const uploadTransactions = async (req, res, next) => {
       const keys = Object.keys(record);
       // Find possible column names (case-insensitive)
       const dateKey = keys.find(k => k.toLowerCase().includes('date'));
-      const descKey = keys.find(k => k.toLowerCase().includes('desc') || k.toLowerCase().includes('particular'));
-      const amtKey = keys.find(k => k.toLowerCase().includes('amount') || k.toLowerCase().includes('withdrawal') || k.toLowerCase().includes('deposit'));
-      const typeKey = keys.find(k => k.toLowerCase().includes('type') || k.toLowerCase().includes('cr/dr'));
-
-      if (!dateKey || !descKey || !amtKey) continue;
-
-      let amount = parseFloat(record[amtKey].replace(/,/g, ''));
-      if (isNaN(amount)) continue;
-
-      let type = 'expense';
-      let rawType = record[typeKey] ? record[typeKey].toLowerCase() : '';
+      const descKey = keys.find(k => k.toLowerCase().includes('desc') || k.toLowerCase().includes('particular') || k.toLowerCase().includes('narration'));
       
-      // Determine type based on amount sign or type column
-      if (amount < 0 || rawType.includes('dr') || rawType.includes('debit')) {
+      const withdrawalKey = keys.find(k => k.toLowerCase().includes('withdrawal') || k.toLowerCase().includes('dr') || k.toLowerCase().includes('debit'));
+      const depositKey = keys.find(k => k.toLowerCase().includes('deposit') || k.toLowerCase().includes('cr') || k.toLowerCase().includes('credit'));
+      const amtKey = keys.find(k => k.toLowerCase().includes('amount') || k.toLowerCase().includes('value') || k.toLowerCase().includes('txn'));
+      const typeKey = keys.find(k => k.toLowerCase().includes('type'));
+
+      if (!dateKey || !descKey) continue;
+
+      let amount = NaN;
+      let type = 'expense';
+
+      // Handle split withdrawal/deposit columns
+      if (withdrawalKey && record[withdrawalKey] && String(record[withdrawalKey]).trim() !== '') {
+        amount = parseFloat(String(record[withdrawalKey]).replace(/,/g, ''));
         type = 'expense';
-        amount = Math.abs(amount);
-      } else if (rawType.includes('cr') || rawType.includes('credit') || record[amtKey].toLowerCase().includes('deposit')) {
+      } else if (depositKey && record[depositKey] && String(record[depositKey]).trim() !== '') {
+        amount = parseFloat(String(record[depositKey]).replace(/,/g, ''));
         type = 'income';
+      } else if (amtKey && record[amtKey] && String(record[amtKey]).trim() !== '') {
+        amount = parseFloat(String(record[amtKey]).replace(/,/g, ''));
+        let rawType = record[typeKey] ? String(record[typeKey]).toLowerCase() : '';
+        if (amount < 0 || rawType.includes('dr') || rawType.includes('debit') || String(record[amtKey]).toLowerCase().includes('dr')) {
+          type = 'expense';
+          amount = Math.abs(amount);
+        } else if (rawType.includes('cr') || rawType.includes('credit') || String(record[amtKey]).toLowerCase().includes('cr') || String(record[amtKey]).toLowerCase().includes('deposit')) {
+          type = 'income';
+        }
       }
+
+      if (isNaN(amount)) continue;
 
       parsedTransactions.push({
         date: new Date(record[dateKey]),
