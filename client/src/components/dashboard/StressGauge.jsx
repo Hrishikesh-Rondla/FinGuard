@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import clsx from 'clsx';
 import { getStressHexColor } from '@/utils/helpers';
 
 export default function StressGauge({ stressScore = 0, stressLevel = 'Low', probabilities = {} }) {
@@ -9,7 +8,6 @@ export default function StressGauge({ stressScore = 0, stressLevel = 'Low', prob
   }, [stressScore]);
 
   const color = getStressHexColor(stressLevel);
-  const isHigh = stressLevel?.toLowerCase() === 'high';
 
   // SVG semicircle gauge
   const radius = 80;
@@ -22,17 +20,17 @@ export default function StressGauge({ stressScore = 0, stressLevel = 'Low', prob
   const remainingLength = circumference - filledLength;
 
   const probData = [
-    { label: 'Low', value: probabilities.Low || probabilities.low || probabilities[0] || 0, color: '#00D4AA' },
-    { label: 'Medium', value: probabilities.Medium || probabilities.medium || probabilities[1] || 0, color: '#F59E0B' },
-    { label: 'High', value: probabilities.High || probabilities.high || probabilities[2] || 0, color: '#F43F5E' },
+    { label: 'Low', value: probabilities.Low || probabilities.low || probabilities[0] || 0, color: '#10b981' },
+    { label: 'Medium', value: probabilities.Medium || probabilities.medium || probabilities[1] || 0, color: '#f59e0b' },
+    { label: 'High', value: probabilities.High || probabilities.high || probabilities[2] || 0, color: '#f43f5e' },
   ];
 
   return (
     <div
       id="stress-gauge"
-      className={clsx('glass-card p-6 flex flex-col items-center', isHigh && 'pulse-ring-animation')}
+      className="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex flex-col items-center"
     >
-      <h3 className="text-sm font-medium text-gray-400 mb-4">Financial Stress Level</h3>
+      <h3 className="text-sm font-medium text-slate-400 mb-4">Financial Stress Level</h3>
 
       {/* SVG Gauge */}
       <div className="relative w-full max-w-[220px]">
@@ -41,7 +39,7 @@ export default function StressGauge({ stressScore = 0, stressLevel = 'Low', prob
           <path
             d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
             fill="none"
-            stroke="#334155"
+            stroke="rgba(148,163,184,0.15)"
             strokeWidth={strokeWidth}
             strokeLinecap="round"
           />
@@ -60,7 +58,7 @@ export default function StressGauge({ stressScore = 0, stressLevel = 'Low', prob
             x={cx}
             y={cy}
             textAnchor="middle"
-            className="font-bold"
+            className="font-display font-bold"
             style={{ fontSize: '24px', fill: color }}
           >
             {stressLevel?.toUpperCase()}
@@ -70,18 +68,18 @@ export default function StressGauge({ stressScore = 0, stressLevel = 'Low', prob
 
       {/* Probability bars */}
       <div className="w-full mt-4 space-y-3">
-        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Probabilities</p>
+        <p className="text-xs text-slate-400 font-medium">Probabilities</p>
         {probData.map((item) => (
           <div key={item.label} className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-400">{item.label}</span>
-              <span className="text-xs font-mono text-gray-300">
+              <span className="text-xs font-medium text-slate-400">{item.label}</span>
+              <span className="text-xs font-mono text-slate-300">
                 {(item.value * 100).toFixed(1)}%
               </span>
             </div>
-            <div className="w-full h-1.5 bg-navy-700 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all duration-700 ease-out"
+                className="h-full rounded-full transition-all duration-1000 ease-out"
                 style={{
                   width: `${item.value * 100}%`,
                   backgroundColor: item.color,

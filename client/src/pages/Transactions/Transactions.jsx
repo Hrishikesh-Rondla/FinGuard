@@ -4,6 +4,7 @@ import TransactionTable from '@/components/transactions/TransactionTable';
 import TransactionForm from '@/components/transactions/TransactionForm';
 import BankStatementUpload from '@/components/transactions/BankStatementUpload';
 import { transactions as txApi } from '@/services/api';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Transactions() {
   const [transactionList, setTransactionList] = useState([]);
@@ -109,20 +110,25 @@ export default function Transactions() {
   return (
     <div id="transactions-page" className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div 
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
         <div>
-          <h2 className="text-lg font-semibold text-gray-100">All Transactions</h2>
-          <p className="text-sm text-gray-500">Manage your income and expenses</p>
+          <h2 className="text-xl font-semibold text-slate-100">All Transactions</h2>
+          <p className="text-sm text-slate-400 mt-1">Manage your income and expenses</p>
         </div>
         
         {/* Tabs */}
-        <div className="flex bg-gray-900 rounded-lg p-1 w-full sm:w-auto">
+        <div className="flex bg-slate-800 border border-slate-700 rounded-lg p-1 w-full sm:w-auto">
           <button
             onClick={() => setActiveTab('manual')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-all duration-200 ${
               activeTab === 'manual' 
-                ? 'bg-gray-800 text-white shadow-sm' 
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-slate-700 text-slate-100' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -131,10 +137,10 @@ export default function Transactions() {
           </button>
           <button
             onClick={() => setActiveTab('upload')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-all duration-200 ${
               activeTab === 'upload' 
-                ? 'bg-gray-800 text-teal shadow-sm' 
-                : 'text-gray-400 hover:text-teal'
+                ? 'bg-slate-700 text-slate-100' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
             }`}
           >
             <Upload className="w-4 h-4" />
@@ -142,64 +148,83 @@ export default function Transactions() {
             <span className="sm:hidden">Upload</span>
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Feedback */}
-      {error && (
-        <div className="bg-rose/10 border border-rose/30 text-rose text-sm px-4 py-3 rounded-xl">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="bg-teal/10 border border-teal/30 text-teal text-sm px-4 py-3 rounded-xl">
-          {success}
-        </div>
-      )}
+      <AnimatePresence>
+        {error && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm px-4 py-3 rounded-xl"
+          >
+            {error}
+          </motion.div>
+        )}
+        {success && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm px-4 py-3 rounded-xl"
+          >
+            {success}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Content based on Tab */}
-      {activeTab === 'manual' ? (
-        <>
-          <div className="flex justify-end">
-            <button
-              id="add-transaction-btn"
-              onClick={() => {
-                setEditData(null);
-                setFormOpen(true);
-              }}
-              className="btn-primary flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add Transaction
-            </button>
-          </div>
+      <motion.div
+        key={activeTab}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        {activeTab === 'manual' ? (
+          <>
+            <div className="flex justify-end mb-4">
+              <button
+                id="add-transaction-btn"
+                onClick={() => {
+                  setEditData(null);
+                  setFormOpen(true);
+                }}
+                className="btn-primary flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                Add Transaction
+              </button>
+            </div>
 
           {/* Loading */}
-          {loading && transactionList.length === 0 ? (
-            <div className="flex items-center justify-center min-h-[40vh]">
-              <Loader2 className="w-8 h-8 text-teal animate-spin" />
-            </div>
-          ) : (
-            <TransactionTable
-              transactions={transactionList}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              pagination={pagination}
-              onPageChange={handlePageChange}
-              onFilterChange={handleFilterChange}
-            />
-          )}
+            {loading && transactionList.length === 0 ? (
+              <div className="flex items-center justify-center min-h-[40vh]">
+                <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+              </div>
+            ) : (
+              <TransactionTable
+                transactions={transactionList}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onFilterChange={handleFilterChange}
+              />
+            )}
 
-          {/* Transaction Form Modal */}
-          <TransactionForm
-            isOpen={formOpen}
-            onClose={handleFormClose}
-            onSubmit={editData ? handleUpdate : handleAdd}
-            initialData={editData}
-          />
-        </>
-      ) : (
-        <BankStatementUpload onUploadComplete={handleUploadComplete} />
-      )}
+            {/* Transaction Form Modal */}
+            <TransactionForm
+              isOpen={formOpen}
+              onClose={handleFormClose}
+              onSubmit={editData ? handleUpdate : handleAdd}
+              initialData={editData}
+            />
+          </>
+        ) : (
+          <BankStatementUpload onUploadComplete={handleUploadComplete} />
+        )}
+      </motion.div>
     </div>
   );
 }

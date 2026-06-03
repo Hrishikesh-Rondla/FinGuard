@@ -275,15 +275,16 @@ FinGuard/
 
 ---
 
-## 🎨 UI Design
+## 🎨 UI Design (Premium Fintech Aesthetic)
 
-- **Theme**: Dark-mode financial dashboard
-- **Background**: Deep navy (`#0F172A`)
-- **Accents**: Teal (`#00D4AA`), Amber (`#F59E0B`), Rose (`#F43F5E`)
-- **Fonts**: IBM Plex Mono (data), DM Sans (body)
-- **Style**: Glassmorphism cards with backdrop-blur
-- **Responsive**: Sidebar → bottom nav on mobile
-- **Animations**: Smooth transitions, pulse ring on high stress
+- **Theme**: Clean, professional, iPhone-like financial dashboard
+- **Background**: Professional Slate (`#0f172a`) with structured, unified layouts
+- **Atmosphere**: Minimalist, clear, and data-driven
+- **Accents**: Blue (`#3b82f6`), Emerald (`#10b981`), Rose (`#f43f5e`), Amber (`#f59e0b`)
+- **Typography**: Clean system sans-serif fonts for structured readability and data clarity
+- **Style**: Crisp borders (`border-slate-700`), rounded cards (`rounded-2xl`), and solid `slate-800` card backgrounds instead of glowing glassmorphism
+- **Animations**: Subtle, performant hover transitions and clean entrance staggers without heavy visual overhead
+- **Responsive**: Adaptive grids, unified top navigation bar (desktop), mobile-friendly bottom bar, and smooth interactions
 
 ---
 

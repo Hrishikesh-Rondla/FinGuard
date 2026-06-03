@@ -3,6 +3,26 @@ import { useAuth } from '@/context/AuthContext';
 import { User, Mail, Calendar, DollarSign, Lock, Loader2, Save } from 'lucide-react';
 import { formatDate } from '@/utils/helpers';
 import api from '@/services/api';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" }
+  }
+};
 
 export default function Profile() {
   const { user } = useAuth();
@@ -52,14 +72,20 @@ export default function Profile() {
   };
 
   return (
-    <div id="profile-page" className="max-w-2xl mx-auto space-y-6">
+    <motion.div 
+      id="profile-page" 
+      className="max-w-2xl mx-auto space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {/* User Info */}
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-100 mb-6">Profile Information</h3>
+      <motion.div variants={itemVariants} className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-6">Profile Information</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-teal/20 rounded-2xl flex items-center justify-center">
-              <span className="text-2xl font-bold text-teal">
+            <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/20">
+              <span className="text-2xl font-bold text-blue-400">
                 {user?.name
                   ? user.name
                       .split(' ')
@@ -71,62 +97,78 @@ export default function Profile() {
               </span>
             </div>
             <div>
-              <h4 className="text-lg font-medium text-gray-100">{user?.name || 'User'}</h4>
-              <p className="text-sm text-gray-500">Member</p>
+              <h4 className="text-lg font-medium text-slate-100">{user?.name || 'User'}</h4>
+              <p className="text-xs text-slate-500">Member</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-700">
             <div className="flex items-center gap-3">
-              <User className="w-4 h-4 text-gray-500" />
+              <div className="p-2 bg-slate-700/50 rounded-lg border border-slate-700">
+                <User className="w-4 h-4 text-blue-400" />
+              </div>
               <div>
-                <p className="text-xs text-gray-500">Full Name</p>
-                <p className="text-sm text-gray-200">{user?.name || '—'}</p>
+                <p className="text-xs text-slate-500">Full Name</p>
+                <p className="text-sm text-slate-200">{user?.name || '—'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Mail className="w-4 h-4 text-gray-500" />
+              <div className="p-2 bg-slate-700/50 rounded-lg border border-slate-700">
+                <Mail className="w-4 h-4 text-blue-400" />
+              </div>
               <div>
-                <p className="text-xs text-gray-500">Email</p>
-                <p className="text-sm text-gray-200">{user?.email || '—'}</p>
+                <p className="text-xs text-slate-500">Email</p>
+                <p className="text-sm text-slate-200">{user?.email || '—'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Calendar className="w-4 h-4 text-gray-500" />
+              <div className="p-2 bg-slate-700/50 rounded-lg border border-slate-700">
+                <Calendar className="w-4 h-4 text-blue-400" />
+              </div>
               <div>
-                <p className="text-xs text-gray-500">Joined</p>
-                <p className="text-sm text-gray-200">
+                <p className="text-xs text-slate-500">Joined</p>
+                <p className="text-sm text-slate-200">
                   {formatDate(user?.createdAt || user?.created_at) || '—'}
                 </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-
+      </motion.div>
 
       {/* Change Password */}
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
-          <Lock className="w-5 h-5 text-amber" />
+      <motion.div variants={itemVariants} className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+          <Lock className="w-5 h-5 text-amber-400" />
           Change Password
         </h3>
 
-        {pwError && (
-          <div className="bg-rose/10 border border-rose/30 text-rose text-sm px-4 py-3 rounded-xl mb-4">
-            {pwError}
-          </div>
-        )}
-        {pwSuccess && (
-          <div className="bg-teal/10 border border-teal/30 text-teal text-sm px-4 py-3 rounded-xl mb-4">
-            {pwSuccess}
-          </div>
-        )}
+        <AnimatePresence>
+          {pwError && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm px-4 py-3 rounded-xl mb-4"
+            >
+              {pwError}
+            </motion.div>
+          )}
+          {pwSuccess && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm px-4 py-3 rounded-xl mb-4"
+            >
+              {pwSuccess}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <div>
-            <label htmlFor="current-password" className="block text-sm text-gray-400 mb-1.5">
+            <label htmlFor="current-password" className="block text-xs text-slate-400 mb-1.5">
               Current Password
             </label>
             <input
@@ -137,11 +179,11 @@ export default function Profile() {
               onChange={(e) =>
                 setPasswords((prev) => ({ ...prev, currentPassword: e.target.value }))
               }
-              className="input-field"
+              className="input-field py-2.5"
             />
           </div>
           <div>
-            <label htmlFor="new-password" className="block text-sm text-gray-400 mb-1.5">
+            <label htmlFor="new-password" className="block text-xs text-slate-400 mb-1.5">
               New Password
             </label>
             <input
@@ -152,11 +194,11 @@ export default function Profile() {
               onChange={(e) =>
                 setPasswords((prev) => ({ ...prev, newPassword: e.target.value }))
               }
-              className="input-field"
+              className="input-field py-2.5"
             />
           </div>
           <div>
-            <label htmlFor="confirm-new-password" className="block text-sm text-gray-400 mb-1.5">
+            <label htmlFor="confirm-new-password" className="block text-xs text-slate-400 mb-1.5">
               Confirm New Password
             </label>
             <input
@@ -167,24 +209,24 @@ export default function Profile() {
               onChange={(e) =>
                 setPasswords((prev) => ({ ...prev, confirmPassword: e.target.value }))
               }
-              className="input-field"
+              className="input-field py-2.5"
             />
           </div>
           <button
             type="submit"
             id="change-password-btn"
             disabled={pwLoading}
-            className="btn-primary flex items-center gap-2 disabled:opacity-50"
+            className="btn-primary flex items-center gap-2 mt-4"
           >
             {pwLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Lock className="w-4 h-4" />
+              <Lock className="w-5 h-5" />
             )}
-            Update Password
+            {pwLoading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

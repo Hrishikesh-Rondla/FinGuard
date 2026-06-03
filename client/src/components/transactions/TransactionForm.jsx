@@ -96,18 +96,18 @@ export default function TransactionForm({ isOpen, onClose, onSubmit, initialData
       {/* Modal */}
       <div
         id="transaction-form-modal"
-        className="relative glass-card p-6 w-full max-w-md animate-in zoom-in-95 duration-200"
+        className="relative bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl w-full max-w-md"
         style={{ animation: 'fadeInScale 0.2s ease-out' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-100">
+          <h2 className="text-lg font-semibold text-slate-100">
             {isEdit ? 'Update Transaction' : 'Add Transaction'}
           </h2>
           <button
             id="close-transaction-form"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-navy-700/50 text-gray-500 hover:text-gray-300 transition-all duration-200"
+            className="p-2 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-slate-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -117,7 +117,7 @@ export default function TransactionForm({ isOpen, onClose, onSubmit, initialData
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Amount */}
           <div>
-            <label htmlFor="tx-amount" className="block text-sm text-gray-400 mb-1.5">
+            <label htmlFor="tx-amount" className="block text-sm font-medium text-slate-300 mb-1.5">
               Amount ($)
             </label>
             <input
@@ -128,23 +128,23 @@ export default function TransactionForm({ isOpen, onClose, onSubmit, initialData
               placeholder="0.00"
               value={formData.amount}
               onChange={(e) => handleChange('amount', e.target.value)}
-              className={clsx('input-field font-mono', errors.amount && 'border-rose/50')}
+              className={clsx('input-field font-mono', errors.amount && 'border-rose-500/50')}
             />
             {errors.amount && (
-              <p className="text-xs text-rose mt-1">{errors.amount}</p>
+              <p className="text-xs text-rose-400 mt-1">{errors.amount}</p>
             )}
           </div>
 
           {/* Category */}
           <div>
-            <label htmlFor="tx-category" className="block text-sm text-gray-400 mb-1.5">
+            <label htmlFor="tx-category" className="block text-sm font-medium text-slate-300 mb-1.5">
               Category
             </label>
             <select
               id="tx-category"
               value={formData.category}
               onChange={(e) => handleChange('category', e.target.value)}
-              className={clsx('input-field', errors.category && 'border-rose/50')}
+              className={clsx('input-field', errors.category && 'border-rose-500/50')}
             >
               <option value="">Select category</option>
               {CATEGORIES.map((cat) => (
@@ -154,20 +154,20 @@ export default function TransactionForm({ isOpen, onClose, onSubmit, initialData
               ))}
             </select>
             {errors.category && (
-              <p className="text-xs text-rose mt-1">{errors.category}</p>
+              <p className="text-xs text-rose-400 mt-1">{errors.category}</p>
             )}
           </div>
 
           {/* Type */}
           <div>
-            <label htmlFor="tx-type" className="block text-sm text-gray-400 mb-1.5">
+            <label htmlFor="tx-type" className="block text-sm font-medium text-slate-300 mb-1.5">
               Type
             </label>
             <select
               id="tx-type"
               value={formData.type}
               onChange={(e) => handleChange('type', e.target.value)}
-              className={clsx('input-field', errors.type && 'border-rose/50')}
+              className={clsx('input-field', errors.type && 'border-rose-500/50')}
             >
               <option value="">Select type</option>
               {TYPES.map((type) => (
@@ -177,13 +177,13 @@ export default function TransactionForm({ isOpen, onClose, onSubmit, initialData
               ))}
             </select>
             {errors.type && (
-              <p className="text-xs text-rose mt-1">{errors.type}</p>
+              <p className="text-xs text-rose-400 mt-1">{errors.type}</p>
             )}
           </div>
 
           {/* Description */}
           <div>
-            <label htmlFor="tx-description" className="block text-sm text-gray-400 mb-1.5">
+            <label htmlFor="tx-description" className="block text-sm font-medium text-slate-300 mb-1.5">
               Description
             </label>
             <input
@@ -198,7 +198,7 @@ export default function TransactionForm({ isOpen, onClose, onSubmit, initialData
 
           {/* Date */}
           <div>
-            <label htmlFor="tx-date" className="block text-sm text-gray-400 mb-1.5">
+            <label htmlFor="tx-date" className="block text-sm font-medium text-slate-300 mb-1.5">
               Date
             </label>
             <input
@@ -206,10 +206,10 @@ export default function TransactionForm({ isOpen, onClose, onSubmit, initialData
               type="date"
               value={formData.date}
               onChange={(e) => handleChange('date', e.target.value)}
-              className={clsx('input-field', errors.date && 'border-rose/50')}
+              className={clsx('input-field', errors.date && 'border-rose-500/50')}
             />
             {errors.date && (
-              <p className="text-xs text-rose mt-1">{errors.date}</p>
+              <p className="text-xs text-rose-400 mt-1">{errors.date}</p>
             )}
           </div>
 
@@ -222,7 +222,7 @@ export default function TransactionForm({ isOpen, onClose, onSubmit, initialData
               className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {submitting ? (
-                <span className="w-4 h-4 border-2 border-navy-900/30 border-t-navy-900 rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : null}
               {isEdit ? 'Update Transaction' : 'Add Transaction'}
             </button>

@@ -53,49 +53,49 @@ export function formatDateRelative(date) {
 export function getStressColor(level) {
   switch (level?.toLowerCase?.()) {
     case 'low':
-      return 'teal';
+      return 'emerald';
     case 'medium':
       return 'amber';
     case 'high':
       return 'rose';
     default:
-      return 'teal';
+      return 'emerald';
   }
 }
 
 /**
- * Get hex color for stress level
+ * Get hex color for stress level — professional muted tones
  */
 export function getStressHexColor(level) {
   switch (level?.toLowerCase?.()) {
     case 'low':
-      return '#00D4AA';
+      return '#10b981'; // emerald-500
     case 'medium':
-      return '#F59E0B';
+      return '#f59e0b'; // amber-500
     case 'high':
-      return '#F43F5E';
+      return '#f43f5e'; // rose-500
     default:
-      return '#00D4AA';
+      return '#10b981';
   }
 }
 
 /**
- * Category color map
+ * Category color map — professional muted palette
  */
 const CATEGORY_COLORS = {
-  rent: '#8B5CF6',
-  groceries: '#10B981',
-  utilities: '#3B82F6',
-  transport: '#F59E0B',
-  entertainment: '#EC4899',
-  dining: '#F97316',
-  shopping: '#A855F7',
-  healthcare: '#06B6D4',
-  education: '#6366F1',
-  debt_payment: '#EF4444',
-  income: '#00D4AA',
-  savings: '#22D3EE',
-  other: '#6B7280',
+  rent: '#8b5cf6',
+  groceries: '#10b981',
+  utilities: '#3b82f6',
+  transport: '#f59e0b',
+  entertainment: '#ec4899',
+  dining: '#f97316',
+  shopping: '#a855f7',
+  healthcare: '#06b6d4',
+  education: '#6366f1',
+  debt_payment: '#ef4444',
+  income: '#10b981',
+  savings: '#22d3ee',
+  other: '#6b7280',
 };
 
 export function getCategoryColor(category) {

@@ -42,11 +42,11 @@ export default function TransactionTable({
   return (
     <div id="transaction-table" className="space-y-4">
       {/* Filter Bar */}
-      <div className="glass-card p-4">
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4">
         <div className="flex flex-wrap gap-3 items-center">
           {/* Search */}
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
               id="transaction-search"
               type="text"
@@ -59,7 +59,7 @@ export default function TransactionTable({
 
           {/* Category Filter */}
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-500" />
+            <Filter className="w-4 h-4 text-slate-500" />
             <select
               id="transaction-category-filter"
               value={filters.category}
@@ -91,22 +91,22 @@ export default function TransactionTable({
       </div>
 
       {/* Desktop Table */}
-      <div className="glass-card overflow-hidden hidden md:block">
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden hidden md:block">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/10">
-              <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-6 py-4 font-medium">Date</th>
-              <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-6 py-4 font-medium">Description</th>
-              <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-6 py-4 font-medium">Category</th>
-              <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-6 py-4 font-medium">Type</th>
-              <th className="text-right text-xs text-gray-500 uppercase tracking-wider px-6 py-4 font-medium">Amount</th>
-              <th className="text-right text-xs text-gray-500 uppercase tracking-wider px-6 py-4 font-medium">Actions</th>
+            <tr className="border-b border-slate-700">
+              <th className="text-left text-xs text-slate-500 uppercase font-medium px-6 py-4">Date</th>
+              <th className="text-left text-xs text-slate-500 uppercase font-medium px-6 py-4">Description</th>
+              <th className="text-left text-xs text-slate-500 uppercase font-medium px-6 py-4">Category</th>
+              <th className="text-left text-xs text-slate-500 uppercase font-medium px-6 py-4">Type</th>
+              <th className="text-right text-xs text-slate-500 uppercase font-medium px-6 py-4">Amount</th>
+              <th className="text-right text-xs text-slate-500 uppercase font-medium px-6 py-4">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-slate-700/50">
             {transactions.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-12 text-gray-500">
+                <td colSpan={6} className="text-center py-12 text-slate-500">
                   No transactions found
                 </td>
               </tr>
@@ -118,12 +118,12 @@ export default function TransactionTable({
                   <tr
                     key={txId}
                     id={`tx-row-${txId}`}
-                    className="hover:bg-navy-700/30 transition-colors duration-150"
+                    className="hover:bg-slate-700/30 transition-colors"
                   >
-                    <td className="px-6 py-4 text-sm text-gray-300 font-mono">
+                    <td className="px-6 py-4 text-sm text-slate-400 font-mono">
                       {formatDate(tx.date)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-200">
+                    <td className="px-6 py-4 text-sm text-slate-200">
                       {tx.description || '—'}
                     </td>
                     <td className="px-6 py-4">
@@ -138,13 +138,13 @@ export default function TransactionTable({
                         {capitalize(tx.category?.replace('_', ' '))}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-400">
+                    <td className="px-6 py-4 text-sm text-slate-400">
                       {capitalize(tx.type)}
                     </td>
                     <td
                       className={clsx(
                         'px-6 py-4 text-sm font-mono text-right font-medium',
-                        isIncome ? 'text-teal' : 'text-rose'
+                        isIncome ? 'text-emerald-400' : 'text-rose-400'
                       )}
                     >
                       {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
@@ -154,14 +154,14 @@ export default function TransactionTable({
                         <button
                           id={`edit-tx-${txId}`}
                           onClick={() => onEdit && onEdit(tx)}
-                          className="p-2 rounded-lg hover:bg-navy-700/50 text-gray-500 hover:text-gray-300 transition-all duration-200"
+                          className="p-2 rounded-lg hover:bg-slate-700/50 text-slate-500 hover:text-slate-300 transition-colors"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           id={`delete-tx-${txId}`}
                           onClick={() => onDelete && onDelete(txId)}
-                          className="p-2 rounded-lg hover:bg-rose/10 text-gray-500 hover:text-rose transition-all duration-200"
+                          className="p-2 rounded-lg hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -178,7 +178,7 @@ export default function TransactionTable({
       {/* Mobile Card Layout */}
       <div className="md:hidden space-y-3">
         {transactions.length === 0 ? (
-          <div className="glass-card p-8 text-center text-gray-500 text-sm">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center text-slate-500 text-sm">
             No transactions found
           </div>
         ) : (
@@ -186,20 +186,20 @@ export default function TransactionTable({
             const txId = tx._id || tx.id;
             const isIncome = tx.type === 'income' || tx.type === 'savings';
             return (
-              <div key={txId} className="glass-card p-4">
+              <div key={txId} className="bg-slate-800 border border-slate-700 rounded-2xl p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <p className="text-sm font-medium text-gray-200">
+                    <p className="text-sm font-medium text-slate-200">
                       {tx.description || capitalize(tx.category?.replace('_', ' '))}
                     </p>
-                    <p className="text-xs text-gray-500 font-mono mt-0.5">
+                    <p className="text-xs text-slate-500 font-mono mt-0.5">
                       {formatDate(tx.date)}
                     </p>
                   </div>
                   <p
                     className={clsx(
                       'text-sm font-mono font-medium',
-                      isIncome ? 'text-teal' : 'text-rose'
+                      isIncome ? 'text-emerald-400' : 'text-rose-400'
                     )}
                   >
                     {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
@@ -216,18 +216,18 @@ export default function TransactionTable({
                     >
                       {capitalize(tx.category?.replace('_', ' '))}
                     </span>
-                    <span className="text-xs text-gray-500">{capitalize(tx.type)}</span>
+                    <span className="text-xs text-slate-500">{capitalize(tx.type)}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => onEdit && onEdit(tx)}
-                      className="p-1.5 rounded-lg hover:bg-navy-700/50 text-gray-500"
+                      className="p-1.5 rounded-lg hover:bg-slate-700/50 text-slate-500 hover:text-slate-300 transition-colors"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => onDelete && onDelete(txId)}
-                      className="p-1.5 rounded-lg hover:bg-rose/10 text-gray-500"
+                      className="p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -242,7 +242,7 @@ export default function TransactionTable({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-2">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-slate-500">
             Page {page} of {totalPages} ({total} transactions)
           </p>
           <div className="flex items-center gap-2">
@@ -251,10 +251,10 @@ export default function TransactionTable({
               onClick={() => onPageChange && onPageChange(page - 1)}
               disabled={page <= 1}
               className={clsx(
-                'p-2 rounded-lg transition-all duration-200',
+                'p-2 rounded-lg transition-colors',
                 page <= 1
-                  ? 'text-gray-600 cursor-not-allowed'
-                  : 'text-gray-400 hover:bg-navy-700/50 hover:text-gray-200'
+                  ? 'text-slate-600 cursor-not-allowed'
+                  : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
               )}
             >
               <ChevronLeft className="w-5 h-5" />
@@ -264,10 +264,10 @@ export default function TransactionTable({
               onClick={() => onPageChange && onPageChange(page + 1)}
               disabled={page >= totalPages}
               className={clsx(
-                'p-2 rounded-lg transition-all duration-200',
+                'p-2 rounded-lg transition-colors',
                 page >= totalPages
-                  ? 'text-gray-600 cursor-not-allowed'
-                  : 'text-gray-400 hover:bg-navy-700/50 hover:text-gray-200'
+                  ? 'text-slate-600 cursor-not-allowed'
+                  : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
               )}
             >
               <ChevronRight className="w-5 h-5" />
