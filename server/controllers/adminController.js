@@ -73,8 +73,8 @@ const deleteUser = async (req, res) => {
     }
     
     // Cascade delete transactions and predictions
-    await Transaction.deleteMany({ user: user._id });
-    await Prediction.deleteMany({ user: user._id });
+    await Transaction.deleteMany({ userId: user._id });
+    await Prediction.deleteMany({ userId: user._id });
     await User.deleteOne({ _id: user._id });
     
     res.json({ success: true, message: 'User removed' });
