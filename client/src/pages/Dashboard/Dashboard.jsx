@@ -166,7 +166,7 @@ export default function Dashboard() {
         animate="visible"
       >
         <motion.div variants={itemVariants} className="min-w-0">
-          <StressGauge score={stressScore} level={stressLevel} probabilities={probabilities} />
+          <StressGauge stressScore={stressScore} stressLevel={stressLevel} probabilities={probabilities} />
         </motion.div>
         <motion.div variants={itemVariants} className="min-w-0">
           <ExpensePieChart data={expensesByCategory} />
